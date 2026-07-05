@@ -1,3 +1,3 @@
 # Portfolio
 
-My portfolio website.
+A personal portfolio website repository. Ready to start fresh!
