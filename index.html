@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nandan Devadula | Portfolio</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Personal portfolio website of Nandan Devadula - Frontend Developer specializing in modular React UI systems, Web Components, and contributions to IBM's Carbon Design System." />
+  <meta name="keywords" content="Nandan Devadula, Frontend Developer, React, Web Components, Carbon Design System, HCL, UI Developer" />
+  <meta name="author" content="Nandan Devadula" />
+  
+  <!-- Open Graph / Social Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Nandan Devadula | Portfolio" />
+  <meta property="og:description" content="Frontend Developer specializing in modular React UI systems, Web Components, and IBM's Carbon Design System." />
+  <meta property="og:url" content="https://github.com/devadula-nandan" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="index.css" />
+  
+  <!-- Favicon Mock (Fallback SVG representation) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
+</head>
+<body>
+  <!-- Scroll Progress Indicator -->
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+
+  <!-- Precision CAD Crosshair Cursor -->
+  <div class="precision-cursor" id="precision-cursor">
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <div class="crosshair-circle"></div>
+    <div class="crosshair-dot"></div>
+    <div class="crosshair-coords" id="crosshair-coords">X: 0px<br>Y: 0px</div>
+  </div>
+
+  <!-- Fixed Background Canvas -->
+  <div class="portfolio-background">
+    <div class="bg-glow-spot bg-glow-1"></div>
+    <div class="bg-glow-spot bg-glow-2"></div>
+    <div class="bg-glow-spot bg-glow-3"></div>
+    <div class="bg-glow-spot mouse-glow" id="mouse-glow"></div>
+  </div>
+
+  <!-- Custom Navigation Header -->
+  <portfolio-header></portfolio-header>
+  
+  <!-- Main Contents -->
+  <main>
+    <portfolio-hero></portfolio-hero>
+    <portfolio-about></portfolio-about>
+    <portfolio-skills></portfolio-skills>
+    <portfolio-experience></portfolio-experience>
+    <portfolio-projects></portfolio-projects>
+    <github-stats></github-stats>
+    <portfolio-contact></portfolio-contact>
+  </main>
+  
+  <!-- Footer -->
+  <portfolio-footer></portfolio-footer>
+  
+  <!-- Main Application Script (ES module) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
