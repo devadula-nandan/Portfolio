@@ -576,8 +576,7 @@ section {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #10b981;
-  /* green */
+  background-color: #b91010;
   display: inline-block;
   animation: pulse 2s infinite ease-in-out;
 }
@@ -1832,7 +1831,9 @@ section {
   transition: opacity var(--transition-fast);
 }
 
-.github-profile-link:hover { opacity: 1; }
+.github-profile-link:hover {
+  opacity: 1;
+}
 
 .github-profile-link .lucide {
   width: 13px;
@@ -1847,7 +1848,8 @@ section {
 
 .contrib-months {
   display: flex;
-  margin-left: 28px; /* align with grid past day labels */
+  margin-left: 28px;
+  /* align with grid past day labels */
   margin-bottom: 4px;
 }
 
@@ -1901,14 +1903,31 @@ section {
   transition: opacity 0.15s;
 }
 
-.contrib-cell:hover { opacity: 0.75; }
+.contrib-cell:hover {
+  opacity: 0.75;
+}
 
 /* Contribution level colors — tuned to portfolio accent */
-.contrib-cell.level-0 { background: var(--border-color); }
-.contrib-cell.level-1 { background: color-mix(in srgb, var(--accent-primary) 25%, transparent); }
-.contrib-cell.level-2 { background: color-mix(in srgb, var(--accent-primary) 50%, transparent); }
-.contrib-cell.level-3 { background: color-mix(in srgb, var(--accent-primary) 75%, transparent); }
-.contrib-cell.level-4 { background: var(--accent-primary); box-shadow: 0 0 4px var(--accent-glow); }
+.contrib-cell.level-0 {
+  background: var(--border-color);
+}
+
+.contrib-cell.level-1 {
+  background: color-mix(in srgb, var(--accent-primary) 25%, transparent);
+}
+
+.contrib-cell.level-2 {
+  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+}
+
+.contrib-cell.level-3 {
+  background: color-mix(in srgb, var(--accent-primary) 75%, transparent);
+}
+
+.contrib-cell.level-4 {
+  background: var(--accent-primary);
+  box-shadow: 0 0 4px var(--accent-glow);
+}
 
 .contrib-footer {
   display: flex;

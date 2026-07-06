@@ -14,7 +14,7 @@ export class PortfolioHero extends HTMLElement {
           <div class="hero-content animate-fade-in">
             <div class="hero-badge">
               <span class="pulse-dot"></span>
-              <span class="hero-badge-text">Open to Opportunities</span>
+              <span class="hero-badge-text">Unavailable</span>
             </div>
             <h1 class="hero-title">
               Hi, I'm <span class="highlight-text">${user.firstName} ${user.lastName}</span>
