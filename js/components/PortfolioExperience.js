@@ -8,16 +8,42 @@ export class PortfolioExperience extends HTMLElement {
 
   render() {
     const experience = resumeData.user.experience;
-    
-    // Sort and filter professional and academic experiences
+
     const professionalItems = experience.filter(item => item.type === 'professional');
     const academicItems = experience.filter(item => item.type === 'academic');
 
     const renderTimeline = (items) => {
       return items.map((item, index) => {
-        const periodStr = item.period.length === 1 
-          ? `${item.period[0]} - Present`
-          : `${item.period[0]} - ${item.period[1]}`;
+        // Format period display
+        const startDate = this.formatDate(item.period[0]);
+        const endDate = item.period.length > 1 ? this.formatDate(item.period[1]) : 'Present';
+        const periodStr = `${startDate} — ${endDate}`;
+
+        // Render skill tags if present
+        const tagsHTML = item.tags && item.tags.length
+          ? `<div class="timeline-tags">
+              ${item.tags.map(tag => `<span class="timeline-tag">${tag}</span>`).join('')}
+            </div>`
+          : '';
+
+        // Render location/workType badge if present
+        const metaHTML = item.location
+          ? `<span class="timeline-meta">
+              <i data-lucide="map-pin"></i> ${item.location}
+              ${item.workType ? `<span class="timeline-worktype">${item.workType}</span>` : ''}
+            </span>`
+          : '';
+
+        // Convert * bullet markers to styled bullets
+        const descHTML = item.description
+          .split('*')
+          .map((part, i) => part.trim())
+          .filter(Boolean)
+          .map((part, i) => i === 0
+            ? `<p class="timeline-desc-lead">${part}</p>`
+            : `<div class="timeline-desc-bullet"><i data-lucide="chevron-right"></i><span>${part}</span></div>`
+          )
+          .join('');
 
         return `
           <div class="timeline-item animate-fade-in" style="animation-delay: ${index * 0.1}s;">
@@ -31,7 +57,9 @@ export class PortfolioExperience extends HTMLElement {
                 <span class="timeline-place-tag">${item.place}</span>
               </div>
               <h3 class="timeline-role">${item.title}</h3>
-              <p class="timeline-description">${item.description.replace(/\*/g, '<br>• ')}</p>
+              ${metaHTML}
+              <div class="timeline-description">${descHTML}</div>
+              ${tagsHTML}
             </div>
           </div>
         `;
@@ -43,15 +71,15 @@ export class PortfolioExperience extends HTMLElement {
         <div class="container">
           <div class="section-header">
             <h2 class="section-title">Experience & Journey</h2>
-            <p class="section-subtitle">A chronological summary of my professional milestones and educational training</p>
+            <p class="section-subtitle">A chronological summary of my professional milestones and educational background</p>
           </div>
           
           <div class="experience-tabs">
             <button class="experience-tab-btn active" data-target="professional">
-              💼 Professional Work
+              <i data-lucide="briefcase"></i> Professional Work
             </button>
             <button class="experience-tab-btn" data-target="academic">
-              🎓 Academic Background
+              <i data-lucide="graduation-cap"></i> Academic Background
             </button>
           </div>
           
@@ -69,6 +97,20 @@ export class PortfolioExperience extends HTMLElement {
     `;
   }
 
+  /**
+   * Formats a date string "M/D/YYYY" → "Month YYYY"
+   * "Present" is returned as-is.
+   */
+  formatDate(dateStr) {
+    if (!dateStr || dateStr === 'Present') return 'Present';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  }
+
   setupTabs() {
     const tabs = this.querySelectorAll('.experience-tab-btn');
     const professionalTimeline = this.querySelector('#timeline-professional');
@@ -76,17 +118,12 @@ export class PortfolioExperience extends HTMLElement {
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        // Remove active class from all tabs
         tabs.forEach(t => t.classList.remove('active'));
-        
-        // Add active class to current tab
         tab.classList.add('active');
-        
-        // Hide all timelines
+
         professionalTimeline.classList.remove('active');
         academicTimeline.classList.remove('active');
-        
-        // Show selected timeline
+
         const target = tab.getAttribute('data-target');
         if (target === 'professional') {
           professionalTimeline.classList.add('active');

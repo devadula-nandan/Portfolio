@@ -117,7 +117,7 @@ export class PortfolioProjects extends HTMLElement {
               ${p.lang || 'Code'}
             </span>
             <span class="project-stars">
-              ⭐ ${p.stars}
+              <i data-lucide="star"></i> ${p.stars}
             </span>
           </div>
           <h3 class="project-card-title">${p.name.replace(/_/g, ' ')}</h3>

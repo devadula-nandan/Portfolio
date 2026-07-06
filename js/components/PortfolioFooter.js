@@ -12,9 +12,7 @@ export class PortfolioFooter extends HTMLElement {
       <footer class="portfolio-footer">
         <div class="container footer-container">
           <div class="footer-logo">
-            <span class="logo-bracket">&lt;</span>
             <span class="logo-text">${user.firstName}.${user.lastName.charAt(0)}</span>
-            <span class="logo-bracket">/&gt;</span>
           </div>
           
           <p class="footer-copy">
@@ -22,11 +20,11 @@ export class PortfolioFooter extends HTMLElement {
           </p>
           
           <p class="footer-credits">
-            Built with ⚡ Vanilla Web Components, CSS3 Grid/Flexbox & GitHub API.
+            Built with <i data-lucide="zap" class="footer-zap"></i> Vanilla Web Components, CSS3 Grid/Flexbox & GitHub API.
           </p>
           
           <a href="#" class="back-to-top" aria-label="Scroll back to top">
-            <span>↑</span>
+            <i data-lucide="arrow-up"></i>
           </a>
         </div>
       </footer>

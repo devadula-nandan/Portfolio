@@ -1,11 +1,32 @@
 import { resumeData, reposData } from './data.js';
 
 const GITHUB_USERNAME = 'devadula-nandan';
+const README_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_USERNAME}/main/README.md`;
 
 /**
- * Fetches dynamic data from the GitHub API with local data fallback.
+ * Parses the portfolio JSON blob embedded in the GitHub profile README.
+ * Format in README: <!-- '{ ...json... }' -->
+ */
+function parseReadmeData(readmeText) {
+  try {
+    const match = readmeText.match(/<!--\s*'(\{[\s\S]*?\})'\s*-->/);
+    if (match && match[1]) {
+      return JSON.parse(match[1]);
+    }
+  } catch (e) {
+    console.warn('Could not parse README JSON, using fallback data.', e);
+  }
+  return null;
+}
+
+/**
+ * Fetches dynamic data from the GitHub profile README and GitHub API.
+ * Falls back to local data.js if any fetch fails.
+ *
+ * Schema v2: supports headline, highlights[], experience[].tags, experience[].location
  */
 export async function getPortfolioData() {
+  // Start with local fallback data
   const data = {
     profile: {
       ...resumeData.user,
@@ -19,17 +40,39 @@ export async function getPortfolioData() {
       totalForks: 4,
       totalRepos: 40,
       languages: {
-        JavaScript: 45,
-        TypeScript: 20,
+        JavaScript: 35,
+        TypeScript: 30,
         Python: 15,
-        HTML: 10,
-        CSS: 10
+        HTML: 12,
+        CSS: 8
       }
     }
   };
 
   try {
-    // 1. Fetch Profile
+    // 1. Fetch GitHub Profile README (source of truth for personal data)
+    const readmePromise = fetch(README_URL)
+      .then(res => {
+        if (!res.ok) throw new Error(`README fetch error: ${res.status}`);
+        return res.text();
+      })
+      .then(readmeText => {
+        const parsed = parseReadmeData(readmeText);
+        if (parsed && parsed.user) {
+          // Merge README data over fallback, keeping github runtime fields
+          const { githubUrl, followers, publicReposCount } = data.profile;
+          data.profile = {
+            ...data.profile,
+            ...parsed.user,
+            githubUrl,
+            followers,
+            publicReposCount,
+          };
+        }
+      })
+      .catch(err => console.warn('Could not fetch GitHub README, using fallback data:', err));
+
+    // 2. Fetch live GitHub Profile stats (followers, repo count, avatar)
     const profilePromise = fetch(`https://api.github.com/users/${GITHUB_USERNAME}`)
       .then(res => {
         if (!res.ok) throw new Error(`Profile fetch error: ${res.status}`);
@@ -43,8 +86,10 @@ export async function getPortfolioData() {
       })
       .catch(err => console.warn('Could not fetch GitHub profile, using fallback:', err));
 
-    // 2. Fetch Repos
-    const reposPromise = fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`)
+    // 3. Fetch live Repos (stars, forks, languages, projects list)
+    const reposPromise = fetch(
+      `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`
+    )
       .then(res => {
         if (!res.ok) throw new Error(`Repos fetch error: ${res.status}`);
         return res.json();
@@ -52,10 +97,9 @@ export async function getPortfolioData() {
       .then(repos => {
         if (!Array.isArray(repos) || repos.length === 0) return;
 
-        // Filter out forks
+        // Exclude forks from stats
         const nonForks = repos.filter(repo => !repo.fork);
-        
-        // Calculate statistics
+
         let stars = 0;
         let forks = 0;
         const langCounts = {};
@@ -68,7 +112,7 @@ export async function getPortfolioData() {
           }
         });
 
-        // Map live repos to our projects structure (ranking them by stars and updates)
+        // Map live repos to project cards
         const mappedRepos = nonForks.map(repo => ({
           name: repo.name,
           desc: repo.description || 'A developer project hosted on GitHub.',
@@ -79,56 +123,52 @@ export async function getPortfolioData() {
           topics: repo.topics || []
         }));
 
-        // Merge with static metadata for details that are better in fallback
+        // Merge: prefer static metadata descriptions + live star counts
         const mergedProjects = [];
-        
-        // Add static items with updated stats if they exist in live, else add them anyway
+
         reposData.forEach(staticItem => {
-          const liveItem = mappedRepos.find(r => r.name.toLowerCase() === staticItem.name.toLowerCase());
-          if (liveItem) {
-            mergedProjects.push({
-              ...staticItem,
-              stars: liveItem.stars || staticItem.stars,
-              homepage: liveItem.homepage || staticItem.homepage,
-              url: liveItem.url || staticItem.url
-            });
-          } else {
-            mergedProjects.push(staticItem);
-          }
+          const liveItem = mappedRepos.find(
+            r => r.name.toLowerCase() === staticItem.name.toLowerCase()
+          );
+          mergedProjects.push(liveItem
+            ? { ...staticItem, stars: liveItem.stars, homepage: liveItem.homepage || staticItem.homepage, url: liveItem.url }
+            : staticItem
+          );
         });
 
-        // Add remaining live projects that are not in the static top projects
+        // Add any remaining live repos not in our static curated list
         mappedRepos.forEach(liveItem => {
-          if (!mergedProjects.some(p => p.name.toLowerCase() === liveItem.name.toLowerCase())) {
-            // Only add if it has description or is significant
-            if (liveItem.desc && liveItem.desc !== 'my portfolio') {
-              mergedProjects.push(liveItem);
-            }
+          const alreadyIn = mergedProjects.some(
+            p => p.name.toLowerCase() === liveItem.name.toLowerCase()
+          );
+          if (!alreadyIn && liveItem.desc && liveItem.name.toLowerCase() !== `${GITHUB_USERNAME}`) {
+            mergedProjects.push(liveItem);
           }
         });
 
         data.projects = mergedProjects;
-
-        // Save computed stats
         data.stats.totalStars = stars;
         data.stats.totalForks = forks;
         data.stats.totalRepos = repos.length;
 
-        // Calculate language percentage
+        // Language percentages (by repo count)
         const totalLangs = Object.values(langCounts).reduce((a, b) => a + b, 0);
-        const langPercentages = {};
-        for (const [lang, count] of Object.entries(langCounts)) {
-          langPercentages[lang] = Math.round((count / totalLangs) * 100);
+        if (totalLangs > 0) {
+          const langPct = {};
+          for (const [lang, count] of Object.entries(langCounts)) {
+            langPct[lang] = Math.round((count / totalLangs) * 100);
+          }
+          data.stats.languages = langPct;
         }
-        data.stats.languages = langPercentages;
       })
       .catch(err => console.warn('Could not fetch GitHub repositories, using fallback:', err));
 
-    // Wait for requests to resolve (with a timeout so it doesn't block the site load)
+    // Wait for all fetches (with a 5s timeout so it never blocks render)
     await Promise.race([
-      Promise.all([profilePromise, reposPromise]),
-      new Promise(resolve => setTimeout(resolve, 3000))
+      Promise.all([readmePromise, profilePromise, reposPromise]),
+      new Promise(resolve => setTimeout(resolve, 5000))
     ]);
+
   } catch (globalError) {
     console.warn('GitHub API fetch failed globally. Running with fallback data.', globalError);
   }

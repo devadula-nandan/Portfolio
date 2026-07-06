@@ -20,11 +20,16 @@
   <link rel="stylesheet" href="index.css" />
   
   <!-- Favicon Mock (Fallback SVG representation) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 fill=%22none%22/><path d=%22M35 35 L20 50 L35 65 M65 35 L80 50 L65 65%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/></svg>">
 </head>
 <body>
   <!-- Scroll Progress Indicator -->
-  <div class="scroll-progress-bar" id="scroll-bar"></div>
+  <div class="scroll-progress-bar" id="scroll-bar">
+    <div class="scroll-progress-cursor">
+      <div class="scroll-progress-cursor-h"></div>
+      <div class="scroll-progress-cursor-v"></div>
+    </div>
+  </div>
 
   <!-- Precision CAD Crosshair Cursor -->
   <div class="precision-cursor" id="precision-cursor">
@@ -59,6 +64,9 @@
   
   <!-- Footer -->
   <portfolio-footer></portfolio-footer>
+  
+  <!-- Lucide Icon Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Main Application Script (ES module) -->
   <script type="module" src="js/app.js"></script>

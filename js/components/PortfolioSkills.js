@@ -71,7 +71,7 @@ export class PortfolioSkills extends HTMLElement {
                 <h3 class="skills-col-title">Technologies & Frameworks</h3>
                 <div class="skills-search-wrapper">
                   <input type="text" id="skills-search" placeholder="Search technologies (e.g. React, Express)..." class="skills-search-input" />
-                  <span class="search-icon">🔍</span>
+                  <span class="search-icon"><i data-lucide="search"></i></span>
                 </div>
               </div>
               
@@ -87,20 +87,19 @@ export class PortfolioSkills extends HTMLElement {
 
   getSkillIcon(skill) {
     const s = skill.toLowerCase();
-    if (s.includes('html')) return '🌐';
-    if (s.includes('css')) return '🎨';
-    if (s.includes('javascript') || s.includes('js')) return '🟨';
-    if (s.includes('react')) return '⚛️';
-    if (s.includes('redux')) return '🔄';
-    if (s.includes('tailwind')) return '🌊';
-    if (s.includes('bootstrap')) return '🅱️';
-    if (s.includes('vue')) return '💚';
-    if (s.includes('mysql') || s.includes('sql')) return '🐬';
-    if (s.includes('python')) return '🐍';
-    if (s.includes('express')) return '⚡';
-    if (s.includes('flask')) return '🧪';
-    if (s.includes('api')) return '🔌';
-    return '🛠️';
+    if (s.includes('html')) return '<i data-lucide="globe"></i>';
+    if (s.includes('css')) return '<i data-lucide="palette"></i>';
+    if (s.includes('javascript') || s.includes('js')) return '<i data-lucide="file-code"></i>';
+    if (s.includes('react')) return '<i data-lucide="atom"></i>';
+    if (s.includes('redux')) return '<i data-lucide="refresh-cw"></i>';
+    if (s.includes('tailwind')) return '<i data-lucide="wind"></i>';
+    if (s.includes('bootstrap')) return '<i data-lucide="layout"></i>';
+    if (s.includes('vue')) return '<i data-lucide="code"></i>';
+    if (s.includes('mysql') || s.includes('sql')) return '<i data-lucide="database"></i>';
+    if (s.includes('python')) return '<i data-lucide="terminal"></i>';
+    if (s.includes('express') || s.includes('flask')) return '<i data-lucide="server"></i>';
+    if (s.includes('api')) return '<i data-lucide="cpu"></i>';
+    return '<i data-lucide="wrench"></i>';
   }
 
   setupSearch() {

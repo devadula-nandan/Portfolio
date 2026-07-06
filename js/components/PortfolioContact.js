@@ -24,7 +24,7 @@ export class PortfolioContact extends HTMLElement {
               
               <div class="contact-cards-stack">
                 <a href="mailto:${user.contact.email}" class="contact-detail-card card">
-                  <div class="detail-icon">✉️</div>
+                  <div class="detail-icon"><i data-lucide="mail"></i></div>
                   <div class="detail-content">
                     <span class="detail-label">Email Address</span>
                     <span class="detail-value">${user.contact.email}</span>
@@ -32,7 +32,7 @@ export class PortfolioContact extends HTMLElement {
                 </a>
                 
                 <a href="tel:${user.contact.phone.replace(/\s+/g, '')}" class="contact-detail-card card">
-                  <div class="detail-icon">📞</div>
+                  <div class="detail-icon"><i data-lucide="phone"></i></div>
                   <div class="detail-content">
                     <span class="detail-label">Phone Number</span>
                     <span class="detail-value">${user.contact.phone}</span>
@@ -40,7 +40,7 @@ export class PortfolioContact extends HTMLElement {
                 </a>
                 
                 <div class="contact-detail-card card">
-                  <div class="detail-icon">📍</div>
+                  <div class="detail-icon"><i data-lucide="map-pin"></i></div>
                   <div class="detail-content">
                     <span class="detail-label">Work Location</span>
                     <span class="detail-value">India (Open to Remote)</span>
@@ -84,7 +84,7 @@ export class PortfolioContact extends HTMLElement {
               </form>
               
               <div class="form-success-alert card" id="success-alert" style="display: none;">
-                <span class="alert-icon">✨</span>
+                <span class="alert-icon"><i data-lucide="sparkles"></i></span>
                 <div class="alert-message">
                   <h4>Message Sent Successfully!</h4>
                   <p>Thank you for reaching out. I'll get back to you shortly.</p>

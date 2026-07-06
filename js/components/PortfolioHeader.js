@@ -10,9 +10,7 @@ export class PortfolioHeader extends HTMLElement {
       <header class="portfolio-header">
         <div class="container header-container">
           <a href="#" class="logo">
-            <span class="logo-bracket">&lt;</span>
             <span class="logo-text">Nandan.D</span>
-            <span class="logo-bracket">/&gt;</span>
           </a>
           
           <nav class="nav-menu" id="nav-menu">
