@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.111.0"
+    "@google/genai": "^2.11.0"
   }
 }

@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI } from '@google/genai';
 
 const ALLOWED_ORIGINS = new Set([
   'https://nandan-dev.com',
@@ -49,20 +49,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 256,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: message }],
+    const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents: message,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        maxOutputTokens: 256,
+      },
     });
 
-    const reply = response.content.find((block) => block.type === 'text')?.text
-      || "Sorry, I couldn't come up with a response to that.";
+    const reply = response.text || "Sorry, I couldn't come up with a response to that.";
 
     res.status(200).json({ reply });
   } catch (err) {
-    console.error('Anthropic API call failed:', err?.status, err?.message);
+    console.error('Gemini API call failed:', err?.status, err?.message);
     res.status(502).json({ error: 'Upstream error' });
   }
 }
