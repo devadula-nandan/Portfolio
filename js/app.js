@@ -25,14 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Scroll Progress Bar
   const scrollBar = document.getElementById('scroll-bar');
   if (scrollBar) {
+    let scrollTicking = false;
     const updateScroll = () => {
       const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
       scrollBar.style.width = scrolled + '%';
       scrollBar.style.opacity = scrolled > 0.5 ? '1' : '0';
+      scrollTicking = false;
     };
-    window.addEventListener('scroll', updateScroll, { passive: true });
+    // Sync updates to the paint cycle instead of running on every raw
+    // scroll event — that's what made the bar feel choppy rather than smooth.
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        requestAnimationFrame(updateScroll);
+        scrollTicking = true;
+      }
+    }, { passive: true });
     updateScroll();
   }
 

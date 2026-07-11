@@ -629,7 +629,7 @@ section {
   width: 0%;
   opacity: 0;
   box-shadow: 0 0 8px var(--accent-glow);
-  transition: width 0.08s ease-out, opacity 0.25s ease;
+  transition: width var(--transition-fast), opacity 0.25s ease;
 }
 
 /* Scroll progress CAD crosshair cursor */
