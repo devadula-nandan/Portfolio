@@ -43,7 +43,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         system_instruction: { parts: { text: SYSTEM_PROMPT } },
         contents: [{ parts: [{ text: message }] }],
-        generationConfig: { maxOutputTokens: 256 },
+        // Higher temperature/topP/topK add variety for open-ended asks (jokes,
+        // hobbies, etc.) — without this the model deterministically picks the
+        // single most-likely reply every time (e.g. the same joke, always).
+        generationConfig: { maxOutputTokens: 256, temperature: 1.4, topP: 0.97, topK: 64 },
       }),
     });
 
