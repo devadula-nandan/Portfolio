@@ -6,14 +6,15 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 const MAX_MESSAGE_LENGTH = 500;
 
 // This small model has near-total probability mass on a handful of stock
-// answers for open-ended asks (e.g. always the same joke) — raising
-// temperature alone doesn't dislodge it, likely because an identical prompt
-// also risks hitting Gemini's own response caching. Appending a random,
-// content-neutral token changes the input each time (busting any cache) and
-// asks for variety without steering toward any particular topic ourselves.
+// answers for open-ended asks (e.g. it always returns the exact same joke) —
+// raising temperature alone doesn't dislodge it, and a generic "vary your
+// phrasing" instruction only reworded the same joke rather than changing it.
+// A random number carries no topical bias of our own choosing, but asking
+// the model to draw creative inspiration from it is a strong enough nudge
+// to actually change the content each time.
 function buildUserContent(message) {
-  const nonce = Math.random().toString(36).slice(2, 8);
-  return `${message}\n\n[vary your phrasing and specific details from previous answers — ${nonce}]`;
+  const seed = Math.floor(Math.random() * 1_000_000);
+  return `${message}\n\n[If this calls for something creative (a joke, an opinion, etc.), let the number ${seed} inspire a genuinely different angle than you'd default to — don't fall back to your usual answer.]`;
 }
 
 const SYSTEM_PROMPT = `You are the virtual assistant embedded in Nandan Devadula's portfolio site. Answer questions about him in first person, as if you were speaking on his behalf, in a friendly and concise way (aim for under 60 words unless the question needs more).
