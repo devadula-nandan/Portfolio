@@ -52,9 +52,25 @@ export class PortfolioAbout extends HTMLElement {
     const fullscreenBtn = this.querySelector('#chat-fullscreen-btn');
 
     if (chatCard && fullscreenBtn) {
+      // position:fixed can't itself be transitioned, so entering/exiting
+      // plays a short scale+fade animation (see .is-fullscreen(-exiting) in
+      // about.css) — the exit direction needs an animationend handoff to
+      // remove the fixed positioning only once that animation finishes,
+      // otherwise the card would just vanish and the page would jump.
       const setFullscreen = (isFullscreen) => {
-        chatCard.classList.toggle('is-fullscreen', isFullscreen);
-        document.body.classList.toggle('chat-fullscreen-lock', isFullscreen);
+        if (isFullscreen) {
+          chatCard.classList.remove('is-fullscreen-exiting');
+          chatCard.classList.add('is-fullscreen');
+          document.body.classList.add('chat-fullscreen-lock');
+        } else {
+          chatCard.classList.remove('is-fullscreen');
+          chatCard.classList.add('is-fullscreen-exiting');
+          chatCard.addEventListener('animationend', function onExitEnd() {
+            chatCard.classList.remove('is-fullscreen-exiting');
+            document.body.classList.remove('chat-fullscreen-lock');
+            chatCard.removeEventListener('animationend', onExitEnd);
+          });
+        }
         fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
         fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen chat' : 'Expand chat to fullscreen');
         fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? 'minimize-2' : 'maximize-2'}" class="fullscreen-icon"></i>`;
