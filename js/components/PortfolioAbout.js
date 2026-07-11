@@ -1,5 +1,10 @@
 import { resumeData, chatResponses, chatFallbackResponse, chatGreeting } from '../data.js';
 
+// Serverless proxy (Vercel) that calls Claude on the assistant's behalf.
+// Filled in once the proxy is deployed; see chat-proxy/api/chat.js.
+const CHAT_API_URL = 'https://portfolio-chat-proxy.vercel.app/api/chat';
+const CHAT_API_TIMEOUT_MS = 8000;
+
 export class PortfolioAbout extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -86,16 +91,39 @@ export class PortfolioAbout extends HTMLElement {
       return typingDiv;
     };
 
-    const triggerBotResponse = (queryText) => {
+    const getAiResponse = async (queryText) => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), CHAT_API_TIMEOUT_MS);
+      try {
+        const res = await fetch(CHAT_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: queryText }),
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`Chat proxy responded with ${res.status}`);
+        const data = await res.json();
+        return data.reply;
+      } finally {
+        clearTimeout(timeout);
+      }
+    };
+
+    const triggerBotResponse = async (queryText) => {
       const typingDiv = showTypingIndicator();
       messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
 
-      // Resolve response after short mock typing delay
-      setTimeout(() => {
-        typingDiv.remove();
-        const reply = getBotResponse(queryText);
-        addMessage(reply, 'bot', true);
-      }, 750);
+      let reply;
+      try {
+        reply = await getAiResponse(queryText);
+      } catch (err) {
+        // Proxy unreachable, rate-limited, or slow — fall back to local answers
+        // so the widget never looks broken.
+        reply = getBotResponse(queryText);
+      }
+
+      typingDiv.remove();
+      addMessage(reply, 'bot', true);
     };
 
     const handleUserSend = (text) => {
