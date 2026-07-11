@@ -52,31 +52,100 @@ export class PortfolioAbout extends HTMLElement {
     const fullscreenBtn = this.querySelector('#chat-fullscreen-btn');
 
     if (chatCard && fullscreenBtn) {
-      // position:fixed can't itself be transitioned, so entering/exiting
-      // plays a short scale+fade animation (see .is-fullscreen(-exiting) in
-      // about.css) — the exit direction needs an animationend handoff to
-      // remove the fixed positioning only once that animation finishes,
-      // otherwise the card would just vanish and the page would jump.
-      const setFullscreen = (isFullscreen) => {
-        if (isFullscreen) {
-          chatCard.classList.remove('is-fullscreen-exiting');
-          chatCard.classList.add('is-fullscreen');
-          document.body.classList.add('chat-fullscreen-lock');
-        } else {
+      // position:fixed can't itself be transitioned, so this runs a FLIP
+      // animation: capture the card's on-screen rect, flip the layout (add/
+      // remove is-fullscreen), then invert-transform it back to look like
+      // the old rect and animate that transform away to identity. That
+      // makes it visually grow from its normal grid spot into the fullscreen
+      // rect (and shrink back the same way on exit) instead of just popping
+      // to full size and fading in place.
+      const FLIP_DURATION = 320;
+      const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      let naturalRect = null; // the card's rect in its normal grid position
+
+      const onTransformTransitionEnd = (cleanup) => {
+        chatCard.addEventListener('transitionend', function onEnd(e) {
+          if (e.target !== chatCard || e.propertyName !== 'transform') return;
+          chatCard.removeEventListener('transitionend', onEnd);
+          cleanup();
+        });
+      };
+
+      // Enter: is-fullscreen is added first (native box becomes the
+      // viewport), then we invert-transform it to still look like the old
+      // natural rect and animate that transform away to identity — growing
+      // from the card's real position into the fullscreen rect.
+      const flipEnter = () => {
+        naturalRect = chatCard.getBoundingClientRect();
+        document.body.classList.add('chat-fullscreen-lock');
+        chatCard.classList.add('is-fullscreen');
+        const fullscreenRect = chatCard.getBoundingClientRect();
+
+        const dx = naturalRect.left - fullscreenRect.left;
+        const dy = naturalRect.top - fullscreenRect.top;
+        const scaleX = naturalRect.width / fullscreenRect.width;
+        const scaleY = naturalRect.height / fullscreenRect.height;
+
+        chatCard.style.transformOrigin = 'top left';
+        chatCard.style.transition = 'none';
+        chatCard.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`;
+        chatCard.getBoundingClientRect(); // force reflow before animating away from it
+
+        requestAnimationFrame(() => {
+          chatCard.style.transition = `transform ${FLIP_DURATION}ms ${FLIP_EASING}`;
+          chatCard.style.transform = 'none';
+        });
+
+        onTransformTransitionEnd(() => {
+          chatCard.style.transition = '';
+          chatCard.style.transform = '';
+          chatCard.style.transformOrigin = '';
+        });
+      };
+
+      // Exit: keep is-fullscreen (fixed, top of stack) applied for the
+      // whole animation and instead animate the transform from identity
+      // down to "looks like the natural rect" — only removing the class
+      // once the transform already matches, so there's no stacking-context
+      // glitch from dropping position:fixed mid-shrink.
+      const flipExit = () => {
+        const fullscreenRect = chatCard.getBoundingClientRect();
+        const targetRect = naturalRect || fullscreenRect;
+
+        const dx = targetRect.left - fullscreenRect.left;
+        const dy = targetRect.top - fullscreenRect.top;
+        const scaleX = targetRect.width / fullscreenRect.width;
+        const scaleY = targetRect.height / fullscreenRect.height;
+
+        chatCard.style.transformOrigin = 'top left';
+        chatCard.style.transition = `transform ${FLIP_DURATION}ms ${FLIP_EASING}`;
+        requestAnimationFrame(() => {
+          chatCard.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`;
+        });
+
+        onTransformTransitionEnd(() => {
           chatCard.classList.remove('is-fullscreen');
-          chatCard.classList.add('is-fullscreen-exiting');
-          chatCard.addEventListener('animationend', function onExitEnd() {
-            chatCard.classList.remove('is-fullscreen-exiting');
-            document.body.classList.remove('chat-fullscreen-lock');
-            chatCard.removeEventListener('animationend', onExitEnd);
-          });
-        }
+          document.body.classList.remove('chat-fullscreen-lock');
+          chatCard.style.transition = '';
+          chatCard.style.transform = '';
+          chatCard.style.transformOrigin = '';
+        });
+      };
+
+      const setFullscreen = (isFullscreen) => {
         fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
         fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen chat' : 'Expand chat to fullscreen');
         fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? 'minimize-2' : 'maximize-2'}" class="fullscreen-icon"></i>`;
         if (window.lucide) {
           window.lucide.createIcons();
         }
+
+        if (isFullscreen) {
+          flipEnter();
+        } else {
+          flipExit();
+        }
+
         messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'auto' });
       };
 

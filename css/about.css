@@ -158,12 +158,13 @@
   box-shadow: var(--shadow-lg), 0 0 25px rgba(0, 242, 254, 0.05);
 }
 
-/* position:fixed itself can't be transitioned, so entering/exiting
-   fullscreen plays a short scale+fade animation instead. is-fullscreen
-   and is-fullscreen-exiting share the fixed/viewport-filling geometry;
-   only the animation direction differs (see PortfolioAbout.js). */
-.about-chat-card.is-fullscreen,
-.about-chat-card.is-fullscreen-exiting {
+/* position:fixed itself can't be transitioned, so PortfolioAbout.js runs a
+   FLIP animation: it captures the card's on-screen rect just before adding
+   this class, then animates a transform from "still looks like the old
+   rect" down to identity — so it visually grows from its normal grid
+   position into the fullscreen rect (and the reverse on exit), instead of
+   just popping to viewport size and fading/scaling in place. */
+.about-chat-card.is-fullscreen {
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -179,24 +180,6 @@
   background: var(--bg-color);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-
-.about-chat-card.is-fullscreen {
-  animation: chatFullscreenEnter 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.about-chat-card.is-fullscreen-exiting {
-  animation: chatFullscreenExit 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-@keyframes chatFullscreenEnter {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes chatFullscreenExit {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.96); }
 }
 
 .chat-panel {
