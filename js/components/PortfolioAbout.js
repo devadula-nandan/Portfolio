@@ -1,8 +1,8 @@
 import { resumeData, chatResponses, chatFallbackResponse, chatGreeting } from '../data.js';
 
-// Serverless proxy (Vercel) that calls Claude on the assistant's behalf.
-// Filled in once the proxy is deployed; see chat-proxy/api/chat.js.
-const CHAT_API_URL = 'https://portfolio-chat-proxy.vercel.app/api/chat';
+// Serverless proxy (Vercel) that calls Gemini on the assistant's behalf.
+// See chat-proxy/api/chat.js.
+const CHAT_API_URL = 'https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat';
 const CHAT_API_TIMEOUT_MS = 8000;
 
 export class PortfolioAbout extends HTMLElement {
