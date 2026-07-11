@@ -62,6 +62,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ reply });
   } catch (err) {
+    console.error('Anthropic API call failed:', err?.status, err?.message);
     res.status(502).json({ error: 'Upstream error' });
   }
 }
