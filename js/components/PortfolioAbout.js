@@ -1,9 +1,15 @@
-import { resumeData, chatResponses, chatFallbackResponse, chatGreeting } from '../data.js';
+import {
+  resumeData,
+  chatResponses,
+  chatFallbackResponse,
+  chatGreeting,
+} from "../data.js";
 
 // Serverless proxy (Vercel) that calls Gemini on the assistant's behalf.
 // See chat-proxy/api/chat.js.
-const CHAT_API_URL = 'https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat';
-const HEALTH_API_URL = CHAT_API_URL.replace(/\/chat$/, '/health');
+const CHAT_API_URL =
+  "https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat";
+const HEALTH_API_URL = CHAT_API_URL.replace(/\/chat$/, "/health");
 const CHAT_API_TIMEOUT_MS = 8000;
 const HEALTH_CHECK_TIMEOUT_MS = 4000;
 
@@ -14,11 +20,11 @@ export class PortfolioAbout extends HTMLElement {
   }
 
   initChatAssistant() {
-    const messagesContainer = this.querySelector('#chat-messages-container');
-    const inputForm = this.querySelector('#chat-input-form');
-    const userInput = this.querySelector('#chat-user-input');
-    const statusDot = this.querySelector('#chat-status-dot');
-    const statusText = this.querySelector('#chat-status-text');
+    const messagesContainer = this.querySelector("#chat-messages-container");
+    const inputForm = this.querySelector("#chat-input-form");
+    const userInput = this.querySelector("#chat-user-input");
+    const statusDot = this.querySelector("#chat-status-dot");
+    const statusText = this.querySelector("#chat-status-text");
 
     if (!messagesContainer || !inputForm || !userInput) return;
 
@@ -28,19 +34,23 @@ export class PortfolioAbout extends HTMLElement {
     // the local keyword-matched fallback ('local') — not just decorative.
     const setChatStatus = (state) => {
       if (!statusDot || !statusText) return;
-      statusDot.classList.toggle('is-local', state === 'local');
-      statusText.textContent = state === 'online' ? 'AGENT_ONLINE' : 'LOCAL_MODE';
+      statusDot.classList.toggle("is-local", state === "local");
+      statusText.textContent =
+        state === "online" ? "AGENT_ONLINE" : "LOCAL_MODE";
     };
 
     const checkChatHealth = async () => {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS);
+      const timeout = setTimeout(
+        () => controller.abort(),
+        HEALTH_CHECK_TIMEOUT_MS,
+      );
       try {
         const res = await fetch(HEALTH_API_URL, { signal: controller.signal });
         const data = await res.json();
-        setChatStatus(res.ok && data.ok ? 'online' : 'local');
+        setChatStatus(res.ok && data.ok ? "online" : "local");
       } catch (err) {
-        setChatStatus('local');
+        setChatStatus("local");
       } finally {
         clearTimeout(timeout);
       }
@@ -48,94 +58,105 @@ export class PortfolioAbout extends HTMLElement {
 
     checkChatHealth();
 
-    const chatCard = this.querySelector('.about-chat-card');
-    const fullscreenBtn = this.querySelector('#chat-fullscreen-btn');
+    const chatCard = this.querySelector(".about-chat-card");
+    const fullscreenBtn = this.querySelector("#chat-fullscreen-btn");
 
     if (chatCard && fullscreenBtn) {
-      // position:fixed can't itself be transitioned, so this runs a FLIP
-      // animation: capture the card's on-screen rect, flip the layout (add/
-      // remove is-fullscreen), then invert-transform it back to look like
-      // the old rect and animate that transform away to identity. That
-      // makes it visually grow from its normal grid spot into the fullscreen
-      // rect (and shrink back the same way on exit) instead of just popping
-      // to full size and fading in place.
+      // position:fixed can't itself be transitioned, and animating it with
+      // transform: scale() distorts the content (text/buttons stretch
+      // non-uniformly). So instead this runs a FLIP animation over the real
+      // box geometry (top/left/width/height): capture the card's on-screen
+      // rect, flip the layout (add/remove is-fullscreen), pin it back to the
+      // old rect with inline px values, then transition those inline values
+      // to the fullscreen rect. The box actually resizes — content reflows
+      // like a normal resize instead of stretching.
       const FLIP_DURATION = 320;
-      const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      const FLIP_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+      const FLIP_TRANSITION = ["top", "left", "width", "height", "min-height"]
+        .map((prop) => `${prop} ${FLIP_DURATION}ms ${FLIP_EASING}`)
+        .join(", ");
       let naturalRect = null; // the card's rect in its normal grid position
 
-      const onTransformTransitionEnd = (cleanup) => {
-        chatCard.addEventListener('transitionend', function onEnd(e) {
-          if (e.target !== chatCard || e.propertyName !== 'transform') return;
-          chatCard.removeEventListener('transitionend', onEnd);
+      const pinRect = (rect) => {
+        chatCard.style.top = `${rect.top}px`;
+        chatCard.style.left = `${rect.left}px`;
+        chatCard.style.width = `${rect.width}px`;
+        chatCard.style.height = `${rect.height}px`;
+        chatCard.style.minHeight = `${rect.height}px`;
+      };
+
+      const unpin = () => {
+        chatCard.style.transition = "";
+        chatCard.style.top = "";
+        chatCard.style.left = "";
+        chatCard.style.width = "";
+        chatCard.style.height = "";
+        chatCard.style.minHeight = "";
+      };
+
+      const onBoxTransitionEnd = (cleanup) => {
+        chatCard.addEventListener("transitionend", function onEnd(e) {
+          if (e.target !== chatCard || e.propertyName !== "width") return;
+          chatCard.removeEventListener("transitionend", onEnd);
           cleanup();
         });
       };
 
       // Enter: is-fullscreen is added first (native box becomes the
-      // viewport), then we invert-transform it to still look like the old
-      // natural rect and animate that transform away to identity — growing
-      // from the card's real position into the fullscreen rect.
+      // viewport), then we pin the box back to the old natural rect with
+      // inline px values and transition those away to the fullscreen rect —
+      // growing from the card's real position/size into the fullscreen one.
       const flipEnter = () => {
         naturalRect = chatCard.getBoundingClientRect();
-        document.body.classList.add('chat-fullscreen-lock');
-        chatCard.classList.add('is-fullscreen');
+        document.body.classList.add("chat-fullscreen-lock");
+
+        chatCard.style.transition = "none";
+        chatCard.classList.add("is-fullscreen");
         const fullscreenRect = chatCard.getBoundingClientRect();
 
-        const dx = naturalRect.left - fullscreenRect.left;
-        const dy = naturalRect.top - fullscreenRect.top;
-        const scaleX = naturalRect.width / fullscreenRect.width;
-        const scaleY = naturalRect.height / fullscreenRect.height;
-
-        chatCard.style.transformOrigin = 'top left';
-        chatCard.style.transition = 'none';
-        chatCard.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`;
+        pinRect(naturalRect);
         chatCard.getBoundingClientRect(); // force reflow before animating away from it
 
         requestAnimationFrame(() => {
-          chatCard.style.transition = `transform ${FLIP_DURATION}ms ${FLIP_EASING}`;
-          chatCard.style.transform = 'none';
+          chatCard.style.transition = FLIP_TRANSITION;
+          pinRect(fullscreenRect);
         });
 
-        onTransformTransitionEnd(() => {
-          chatCard.style.transition = '';
-          chatCard.style.transform = '';
-          chatCard.style.transformOrigin = '';
-        });
+        onBoxTransitionEnd(unpin);
       };
 
       // Exit: keep is-fullscreen (fixed, top of stack) applied for the
-      // whole animation and instead animate the transform from identity
-      // down to "looks like the natural rect" — only removing the class
-      // once the transform already matches, so there's no stacking-context
-      // glitch from dropping position:fixed mid-shrink.
+      // whole animation and instead animate the box down to "the natural
+      // rect" — only removing the class once the box already matches, so
+      // there's no stacking-context glitch from dropping position:fixed
+      // mid-shrink.
       const flipExit = () => {
         const fullscreenRect = chatCard.getBoundingClientRect();
         const targetRect = naturalRect || fullscreenRect;
 
-        const dx = targetRect.left - fullscreenRect.left;
-        const dy = targetRect.top - fullscreenRect.top;
-        const scaleX = targetRect.width / fullscreenRect.width;
-        const scaleY = targetRect.height / fullscreenRect.height;
+        chatCard.style.transition = "none";
+        pinRect(fullscreenRect);
+        chatCard.getBoundingClientRect(); // force reflow before animating
 
-        chatCard.style.transformOrigin = 'top left';
-        chatCard.style.transition = `transform ${FLIP_DURATION}ms ${FLIP_EASING}`;
+        chatCard.style.transition = FLIP_TRANSITION;
         requestAnimationFrame(() => {
-          chatCard.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`;
+          pinRect(targetRect);
         });
 
-        onTransformTransitionEnd(() => {
-          chatCard.classList.remove('is-fullscreen');
-          document.body.classList.remove('chat-fullscreen-lock');
-          chatCard.style.transition = '';
-          chatCard.style.transform = '';
-          chatCard.style.transformOrigin = '';
+        onBoxTransitionEnd(() => {
+          chatCard.classList.remove("is-fullscreen");
+          document.body.classList.remove("chat-fullscreen-lock");
+          unpin();
         });
       };
 
       const setFullscreen = (isFullscreen) => {
-        fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
-        fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen chat' : 'Expand chat to fullscreen');
-        fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? 'minimize-2' : 'maximize-2'}" class="fullscreen-icon"></i>`;
+        fullscreenBtn.setAttribute("aria-pressed", String(isFullscreen));
+        fullscreenBtn.setAttribute(
+          "aria-label",
+          isFullscreen ? "Exit fullscreen chat" : "Expand chat to fullscreen",
+        );
+        fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? "minimize-2" : "maximize-2"}" class="fullscreen-icon"></i>`;
         if (window.lucide) {
           window.lucide.createIcons();
         }
@@ -146,15 +167,21 @@ export class PortfolioAbout extends HTMLElement {
           flipExit();
         }
 
-        messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'auto' });
+        messagesContainer.scrollTo({
+          top: messagesContainer.scrollHeight,
+          behavior: "auto",
+        });
       };
 
-      fullscreenBtn.addEventListener('click', () => {
-        setFullscreen(!chatCard.classList.contains('is-fullscreen'));
+      fullscreenBtn.addEventListener("click", () => {
+        setFullscreen(!chatCard.classList.contains("is-fullscreen"));
       });
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && chatCard.classList.contains('is-fullscreen')) {
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          chatCard.classList.contains("is-fullscreen")
+        ) {
           setFullscreen(false);
         }
       });
@@ -162,24 +189,26 @@ export class PortfolioAbout extends HTMLElement {
 
     const getBotResponse = (query) => {
       const q = query.toLowerCase().trim();
-      const match = chatResponses.find(r => r.keywords.some(k => q.includes(k)));
+      const match = chatResponses.find((r) =>
+        r.keywords.some((k) => q.includes(k)),
+      );
       return match ? match.reply(user) : chatFallbackResponse;
     };
 
     const addMessage = (text, sender, shouldType = false, onComplete) => {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add('chat-message', sender);
-      
-      const bubble = document.createElement('div');
-      bubble.classList.add('msg-bubble');
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("chat-message", sender);
+
+      const bubble = document.createElement("div");
+      bubble.classList.add("msg-bubble");
       msgDiv.appendChild(bubble);
       messagesContainer.appendChild(msgDiv);
 
       if (shouldType) {
-        let currentText = '';
+        let currentText = "";
         let i = 0;
         let isTag = false;
-        
+
         const interval = setInterval(() => {
           if (i >= text.length) {
             clearInterval(interval);
@@ -189,22 +218,22 @@ export class PortfolioAbout extends HTMLElement {
             if (onComplete) onComplete();
             return;
           }
-          
+
           const char = text[i];
-          if (char === '<') {
+          if (char === "<") {
             isTag = true;
           }
-          
+
           currentText += char;
-          
-          if (char === '>') {
+
+          if (char === ">") {
             isTag = false;
           }
-          
+
           i++;
-          
+
           if (isTag) return;
-          
+
           bubble.innerHTML = currentText;
           messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 12); // Typing speed
@@ -215,16 +244,16 @@ export class PortfolioAbout extends HTMLElement {
         }
         messagesContainer.scrollTo({
           top: messagesContainer.scrollHeight,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
         if (onComplete) onComplete();
       }
     };
 
     const showTypingIndicator = () => {
-      const typingDiv = document.createElement('div');
-      typingDiv.classList.add('chat-message', 'bot', 'typing-indicator-msg');
-      typingDiv.setAttribute('aria-hidden', 'true');
+      const typingDiv = document.createElement("div");
+      typingDiv.classList.add("chat-message", "bot", "typing-indicator-msg");
+      typingDiv.setAttribute("aria-hidden", "true");
       typingDiv.innerHTML = `<div class="msg-bubble typing-dots">
         <span></span><span></span><span></span>
       </div>`;
@@ -237,8 +266,8 @@ export class PortfolioAbout extends HTMLElement {
       const timeout = setTimeout(() => controller.abort(), CHAT_API_TIMEOUT_MS);
       try {
         const res = await fetch(CHAT_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: queryText }),
           signal: controller.signal,
         });
@@ -252,56 +281,59 @@ export class PortfolioAbout extends HTMLElement {
 
     const triggerBotResponse = async (queryText) => {
       const typingDiv = showTypingIndicator();
-      messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+      messagesContainer.scrollTo({
+        top: messagesContainer.scrollHeight,
+        behavior: "smooth",
+      });
 
       let reply;
       try {
         reply = await getAiResponse(queryText);
-        setChatStatus('online');
+        setChatStatus("online");
       } catch (err) {
         // Proxy unreachable, rate-limited, or slow — fall back to local answers
         // so the widget never looks broken.
         reply = getBotResponse(queryText);
-        setChatStatus('local');
+        setChatStatus("local");
       }
 
       typingDiv.remove();
-      addMessage(reply, 'bot', true);
+      addMessage(reply, "bot", true);
     };
 
     const handleUserSend = (text) => {
       if (!text.trim()) return;
-      addMessage(text, 'user');
+      addMessage(text, "user");
       triggerBotResponse(text);
     };
 
     // Form submission listener
-    inputForm.addEventListener('submit', (e) => {
+    inputForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const text = userInput.value;
-      userInput.value = '';
+      userInput.value = "";
       handleUserSend(text);
     });
 
     // Quick-reply chips — shown once, inline, right after the greeting
     // finishes typing, and removed as soon as one is picked.
     const QUICK_QUESTIONS = [
-      { question: 'Tell me about yourself', label: 'Tell me about yourself' },
-      { question: 'What is your tech stack?', label: 'Tech Stack' },
-      { question: 'What do you do at IBM?', label: 'IBM Carbon Work' },
-      { question: 'How can I contact you?', label: 'Get in Touch' },
+      { question: "Tell me about yourself", label: "Tell me about yourself" },
+      { question: "What is your tech stack?", label: "Tech Stack" },
+      { question: "What do you do at IBM?", label: "IBM Carbon Work" },
+      { question: "How can I contact you?", label: "Get in Touch" },
     ];
 
     const showSuggestionChips = () => {
-      const chipsWrap = document.createElement('div');
-      chipsWrap.classList.add('chat-chips');
+      const chipsWrap = document.createElement("div");
+      chipsWrap.classList.add("chat-chips");
 
       QUICK_QUESTIONS.forEach(({ question, label }) => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.classList.add('chat-chip');
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.classList.add("chat-chip");
         chip.textContent = label;
-        chip.addEventListener('click', () => {
+        chip.addEventListener("click", () => {
           chipsWrap.remove();
           handleUserSend(question);
         });
@@ -309,22 +341,25 @@ export class PortfolioAbout extends HTMLElement {
       });
 
       messagesContainer.appendChild(chipsWrap);
-      messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+      messagesContainer.scrollTo({
+        top: messagesContainer.scrollHeight,
+        behavior: "smooth",
+      });
     };
 
     const playGreeting = () => {
       const typingDiv = showTypingIndicator();
       setTimeout(() => {
         typingDiv.remove();
-        addMessage(chatGreeting, 'bot', true, showSuggestionChips);
+        addMessage(chatGreeting, "bot", true, showSuggestionChips);
       }, 800);
     };
 
     // Reset button — clears the conversation and replays the greeting
-    const resetBtn = this.querySelector('#chat-reset-btn');
+    const resetBtn = this.querySelector("#chat-reset-btn");
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        messagesContainer.innerHTML = '';
+      resetBtn.addEventListener("click", () => {
+        messagesContainer.innerHTML = "";
         playGreeting();
       });
     }
@@ -332,20 +367,23 @@ export class PortfolioAbout extends HTMLElement {
     // IntersectionObserver to trigger the initial greeting when scrolled into view
     let greetingRun = false;
 
-    const scrollObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !greetingRun) {
-          greetingRun = true;
-          scrollObserver.unobserve(entry.target);
-          playGreeting();
-        }
-      });
-    }, {
-      root: null,
-      threshold: 0.15 // Trigger when 15% of the section is visible
-    });
+    const scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !greetingRun) {
+            greetingRun = true;
+            scrollObserver.unobserve(entry.target);
+            playGreeting();
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.15, // Trigger when 15% of the section is visible
+      },
+    );
 
-    const aboutSection = this.querySelector('#about');
+    const aboutSection = this.querySelector("#about");
     if (aboutSection) {
       scrollObserver.observe(aboutSection);
     }
@@ -354,15 +392,15 @@ export class PortfolioAbout extends HTMLElement {
   render() {
     const user = resumeData.user;
     const highlights = user.highlights;
-    
-    const yExp = highlights[0]?.label || '5+ Years';
-    const yExpSub = highlights[0]?.sublabel || 'Frontend Engineering';
-    const carbonRole = highlights[1]?.label || 'IBM Carbon';
-    const carbonSub = highlights[1]?.sublabel || 'Open Source Contributor';
-    const repoCount = highlights[2]?.label || '40+';
-    const repoSub = highlights[2]?.sublabel || 'GitHub Repositories';
-    const wcagRole = highlights[3]?.label || 'WCAG';
-    const wcagSub = highlights[3]?.sublabel || 'Accessibility Advocate';
+
+    const yExp = highlights[0]?.label || "5+ Years";
+    const yExpSub = highlights[0]?.sublabel || "Frontend Engineering";
+    const carbonRole = highlights[1]?.label || "IBM Carbon";
+    const carbonSub = highlights[1]?.sublabel || "Open Source Contributor";
+    const repoCount = highlights[2]?.label || "40+";
+    const repoSub = highlights[2]?.sublabel || "GitHub Repositories";
+    const wcagRole = highlights[3]?.label || "WCAG";
+    const wcagSub = highlights[3]?.sublabel || "Accessibility Advocate";
 
     this.innerHTML = `
       <section class="about-section" id="about">
@@ -483,4 +521,4 @@ export class PortfolioAbout extends HTMLElement {
   }
 }
 
-customElements.define('portfolio-about', PortfolioAbout);
+customElements.define("portfolio-about", PortfolioAbout);
