@@ -18,6 +18,8 @@ export class PortfolioAbout extends HTMLElement {
     const inputForm = this.querySelector('#chat-input-form');
     const userInput = this.querySelector('#chat-user-input');
     const chips = this.querySelectorAll('.chat-chip');
+    const chatChips = this.querySelector('#chat-chips');
+    const suggestionsToggle = this.querySelector('#chat-suggestions-toggle');
     const statusDot = this.querySelector('#chat-status-dot');
     const statusText = this.querySelector('#chat-status-text');
 
@@ -197,12 +199,24 @@ export class PortfolioAbout extends HTMLElement {
       handleUserSend(text);
     });
 
+    // Suggestions toggle — chips stay hidden until asked for
+    if (suggestionsToggle && chatChips) {
+      suggestionsToggle.addEventListener('click', () => {
+        const isVisible = chatChips.classList.toggle('is-visible');
+        suggestionsToggle.setAttribute('aria-expanded', String(isVisible));
+      });
+    }
+
     // Chip click listeners
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         const question = chip.getAttribute('data-question');
         if (question) {
           handleUserSend(question);
+          if (chatChips && suggestionsToggle) {
+            chatChips.classList.remove('is-visible');
+            suggestionsToggle.setAttribute('aria-expanded', 'false');
+          }
         }
       });
     });
@@ -282,7 +296,12 @@ export class PortfolioAbout extends HTMLElement {
                     <!-- Initial message typed dynamically on scroll observer -->
                   </div>
                   
-                  <div class="chat-chips">
+                  <button type="button" class="chat-suggestions-toggle" id="chat-suggestions-toggle" aria-expanded="false" aria-controls="chat-chips">
+                    <i data-lucide="lightbulb" class="suggestions-icon"></i>
+                    <span>Suggestions</span>
+                  </button>
+
+                  <div class="chat-chips" id="chat-chips">
                     <button class="chat-chip" data-question="Tell me about yourself">Tell me about yourself</button>
                     <button class="chat-chip" data-question="What is your tech stack?">Tech Stack</button>
                     <button class="chat-chip" data-question="What do you do at IBM?">IBM Carbon Work</button>
@@ -291,7 +310,7 @@ export class PortfolioAbout extends HTMLElement {
 
                   <form class="chat-input-wrapper" id="chat-input-form">
                     <span class="chat-prompt-prefix font-mono">$</span>
-                    <input type="text" id="chat-user-input" class="chat-input" placeholder="Type a message or click a chip..." required autocomplete="off" />
+                    <input type="text" id="chat-user-input" class="chat-input" placeholder="Type a message or click Suggestions..." required autocomplete="off" />
                     <button type="submit" class="chat-send-btn" aria-label="Send message">
                       <i data-lucide="send" class="send-icon-img"></i>
                     </button>
