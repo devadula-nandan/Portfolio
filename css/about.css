@@ -163,8 +163,12 @@
   inset: 0;
   z-index: 9999;
   width: 100vw;
+  /* dvh tracks the *visible* viewport as mobile browser chrome
+     shows/hides, instead of leaving a gap under a fixed 100vh. */
   height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .chat-panel {
