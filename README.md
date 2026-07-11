@@ -2,7 +2,7 @@
 
 Personal portfolio website of **Nandan Devadula**, Frontend Developer at IBM (Carbon Design System).
 
-**Live site:** https://devadula-nandan.github.io/Portfolio/
+**Live site:** https://nandan-dev.com/
 
 ## Highlights
 
@@ -16,12 +16,18 @@ Personal portfolio website of **Nandan Devadula**, Frontend Developer at IBM (Ca
 
 ```
 ├── index.html              # Entry point, SEO/meta, custom element mounts
-├── index.css               # Full design system (themes, components, animations)
 ├── server.js               # Zero-dependency local dev server
+├── package.json            # `npm start` convenience wrapper — no dependencies
+├── css/                    # One stylesheet per component (base.css loads first)
+│   ├── base.css             # Theme variables, resets, layout, shared UI/utility classes, animations
+│   ├── header.css, hero.css, about.css, skills.css, experience.css,
+│   │   projects.css, github-stats.css, contact.css, footer.css
+│   ├── widgets-fallback.css # GitHub widget fallback styles
+│   └── cursor-effects.css   # CAD crosshair cursor, icon reset, reduced-motion overrides
 └── js/
     ├── app.js              # Component registration + global interactions
     ├── api.js              # GitHub API / profile README data layer (memoized)
-    ├── data.js             # Static fallback data (mirrors profile README JSON)
+    ├── data.js             # Static fallback data + About chat assistant content
     └── components/         # One class per section (header, hero, skills, ...)
 ```
 
@@ -30,7 +36,7 @@ Personal portfolio website of **Nandan Devadula**, Frontend Developer at IBM (Ca
 Requires only [Node.js](https://nodejs.org) (any recent version — no packages needed):
 
 ```bash
-node server.js
+npm start
 # → http://localhost:3000
 ```
 
@@ -38,4 +44,7 @@ Or use any static file server (`npx serve`, VS Code Live Server, etc.) — it's 
 
 ## Deployment
 
-Deployed with GitHub Pages from the repository root. Any push to `main` updates the live site.
+Deployed with GitHub Pages from the repository root — any push to `main` rebuilds and
+publishes automatically, no separate CI config needed. The custom domain
+`nandan-dev.com` is configured in the repo's Pages settings, with DNS (A records +
+`www` CNAME) pointing at GitHub Pages from GoDaddy.

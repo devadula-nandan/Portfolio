@@ -1,0 +1,110 @@
+/* ==========================================================================
+   GitHub Widget Fallback Styles
+   ========================================================================== */
+.widget-col {
+  flex: 1 1 200px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-fallback-card {
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-align: left;
+}
+
+.fallback-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--accent-primary);
+  border-bottom: 1.5px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.trophy-fallback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trophy-fallback-item {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: var(--border-color);
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--accent-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.trophy-fallback-item:hover {
+  border-color: var(--accent-primary);
+}
+
+.local-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.local-stats-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.local-stats-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.local-stats-row span {
+  color: var(--text-muted);
+}
+
+.local-stats-row strong {
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+}
+
+/* Precise-pointer devices only: hide the native cursor (the custom crosshair
+   replaces it) and disable text selection so drag draws a marquee instead. */
+@media (hover: hover) and (pointer: fine) {
+
+  body,
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  iframe {
+    cursor: none !important;
+  }
+
+
+  /* Let text selection work normally, but marquee clicks are restricted in JS */
+}
+
+/* Touch / coarse-pointer devices: remove the custom cursor system entirely
+   (crosshair, mouse glow, drag marquee) — native behavior is restored. */
+@media (hover: none),
+(pointer: coarse) {
+
+  .precision-cursor,
+  .selection-rect,
+  .mouse-glow {
+    display: none !important;
+  }
+}
+

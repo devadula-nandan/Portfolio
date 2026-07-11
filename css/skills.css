@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Skills Component Styles
+   ========================================================================== */
+.skills-categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.skill-category {
+  padding: 28px;
+}
+
+.skill-category-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.skill-category-title .lucide {
+  width: 18px;
+  height: 18px;
+  stroke: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-color);
+  background: var(--border-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.skill-chip:hover {
+  color: var(--accent-primary);
+  background: var(--accent-glow);
+  border-color: var(--border-color-hover);
+}
+
+@media (max-width: 992px) {
+  .skills-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .skills-categories {
+    grid-template-columns: 1fr;
+  }
+}
+

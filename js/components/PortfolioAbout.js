@@ -1,4 +1,4 @@
-import { resumeData } from '../data.js';
+import { resumeData, chatResponses, chatFallbackResponse, chatGreeting } from '../data.js';
 
 export class PortfolioAbout extends HTMLElement {
   connectedCallback() {
@@ -15,70 +15,11 @@ export class PortfolioAbout extends HTMLElement {
     if (!messagesContainer || !inputForm || !userInput) return;
 
     const user = resumeData.user;
-    const cvLink = user.cv;
 
-    // Chatbot responses mapping
     const getBotResponse = (query) => {
       const q = query.toLowerCase().trim();
-
-      if (q.includes('yourself') || q.includes('who are you') || q.includes('bio') || q.includes('introduction') || q.includes('about me')) {
-        return `I am Nandan Devadula, a Frontend Developer at IBM Kochi. I specialize in building enterprise-grade design systems, accessible Web Components, and scalable modular libraries. I bridge the gap between design concepts and production-ready, WCAG-compliant frontend implementations.`;
-      }
-
-      if (q.includes('ibm') || q.includes('carbon') || q.includes('labs') || q.includes('design system')) {
-        return `At IBM, I work with the <strong>Carbon Design System</strong> team. I develop accessible, enterprise-grade components for <em>Carbon for IBM Products</em> and <em>Carbon for AI</em>, write high-coverage unit & E2E tests (Playwright, Jest), and prototype new UI paradigms in Carbon Labs.`;
-      }
-      
-      if (q.includes('stack') || q.includes('tech') || q.includes('skill') || q.includes('framework') || q.includes('react') || q.includes('lit') || q.includes('typescript')) {
-        return `My technical stack is centered around frontend engineering: 
-        <ul>
-          <li><strong>Languages:</strong> JavaScript, TypeScript, CSS/SCSS, HTML5</li>
-          <li><strong>UI Frameworks:</strong> Web Components (Lit, native), React.js, Redux</li>
-          <li><strong>Testing/A11y:</strong> Jest, Cypress, Playwright, WCAG, WAI-ARIA</li>
-          <li><strong>Enterprise:</strong> Carbon Design System, Tailwind CSS</li>
-        </ul>`;
-      }
-      
-      if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('hire') || q.includes('reach') || q.includes('cv') || q.includes('resume')) {
-        return `You can reach me directly at <a href="mailto:${user.contact.email}" class="chat-link">${user.contact.email}</a> or call me at <strong>${user.contact.phone}</strong>. You can also view and download my official resume here: <a href="${cvLink}" target="_blank" rel="noopener noreferrer" class="chat-link">View CV <i data-lucide="external-link"></i></a>.`;
-      }
-
-      if (q.includes('experience') || q.includes('work') || q.includes('hcl') || q.includes('history') || q.includes('job')) {
-        return `I have over <strong>5 years</strong> of professional experience:
-        <ul>
-          <li><strong>IBM</strong> (2023 - Present): Frontend Developer on Carbon Design System.</li>
-          <li><strong>HCL Technologies</strong> (2022 - 2023): Software Engineer building dashboard UIs & REST APIs.</li>
-          <li><strong>Ochre Media</strong> (2021 - 2022): Web UI Developer creating client microsites.</li>
-        </ul>`;
-      }
-
-      if (q.includes('a11y') || q.includes('accessib') || q.includes('wcag') || q.includes('screen reader') || q.includes('aria')) {
-        return `I am an <strong>Accessibility Advocate</strong>. I design components compliant with WCAG 2.1 AA/AAA standards, meaning I build proper keyboard navigation, manage interactive focus outlines, ensure high-contrast colors, and implement semantic WAI-ARIA roles.`;
-      }
-
-      if (q.includes('project') || q.includes('repo') || q.includes('code') || q.includes('github') || q.includes('wc-')) {
-        return `I have created over 40 GitHub repositories! Highlights include:
-        <ul>
-          <li><strong>wc-audio-input:</strong> Audio input web component supporting speech-to-text.</li>
-          <li><strong>wc-resizer:</strong> Lightweight container layout resizer.</li>
-          <li><strong>storybook-theme-carbon:</strong> Themes matching IBM's Carbon aesthetics.</li>
-        </ul>
-        Check them out in the Projects section below or visit my <a href="${user.social.github}" target="_blank" class="chat-link">GitHub Profile</a>.`;
-      }
-
-      if (q.includes('education') || q.includes('college') || q.includes('degree') || q.includes('university') || q.includes('graduate')) {
-        return `I hold a <strong>Bachelor of Engineering (B.E.)</strong> in Electronics & Communication from Andhra University (Gayatri Vidya Parishad College), and a certificate in Software Development from Great Learning.`;
-      }
-
-      if (q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('greet') || q.includes('greetings')) {
-        return `Hello! How can I help you? Ask me about my work at IBM Carbon, my software engineering experience, skills, or projects.`;
-      }
-
-      // Default fallback
-      return `Interesting question! I am specialized to talk about my tech stack, IBM design systems contributions, projects, and career history. Try asking:
-      <br/>- <em>"What is your tech stack?"</em>
-      <br/>- <em>"What do you do at IBM?"</em>
-      <br/>- <em>"How can I contact you?"</em>`;
+      const match = chatResponses.find(r => r.keywords.some(k => q.includes(k)));
+      return match ? match.reply(user) : chatFallbackResponse;
     };
 
     const addMessage = (text, sender, shouldType = false) => {
@@ -134,8 +75,7 @@ export class PortfolioAbout extends HTMLElement {
       }
     };
 
-    const triggerBotResponse = (queryText) => {
-      // 1. Show Typing Indicator
+    const showTypingIndicator = () => {
       const typingDiv = document.createElement('div');
       typingDiv.classList.add('chat-message', 'bot', 'typing-indicator-msg');
       typingDiv.setAttribute('aria-hidden', 'true');
@@ -143,9 +83,14 @@ export class PortfolioAbout extends HTMLElement {
         <span></span><span></span><span></span>
       </div>`;
       messagesContainer.appendChild(typingDiv);
+      return typingDiv;
+    };
+
+    const triggerBotResponse = (queryText) => {
+      const typingDiv = showTypingIndicator();
       messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
 
-      // 2. Resolve response after short mock typing delay
+      // Resolve response after short mock typing delay
       setTimeout(() => {
         typingDiv.remove();
         const reply = getBotResponse(queryText);
@@ -179,26 +124,17 @@ export class PortfolioAbout extends HTMLElement {
 
     // IntersectionObserver to trigger initial message typing when scrolled into view
     let greetingRun = false;
-    const greetingText = "Hi! I am Nandan's virtual assistant. Ask me anything about my frontend engineering background, open-source work at IBM Carbon, or skills!";
-    
+
     const scrollObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && !greetingRun) {
           greetingRun = true;
           scrollObserver.unobserve(entry.target);
-          
-          // Trigger Bot typing indicator
-          const typingDiv = document.createElement('div');
-          typingDiv.classList.add('chat-message', 'bot', 'typing-indicator-msg');
-          typingDiv.setAttribute('aria-hidden', 'true');
-          typingDiv.innerHTML = `<div class="msg-bubble typing-dots">
-            <span></span><span></span><span></span>
-          </div>`;
-          messagesContainer.appendChild(typingDiv);
-          
+
+          const typingDiv = showTypingIndicator();
           setTimeout(() => {
             typingDiv.remove();
-            addMessage(greetingText, 'bot', true);
+            addMessage(chatGreeting, 'bot', true);
           }, 800);
         }
       });

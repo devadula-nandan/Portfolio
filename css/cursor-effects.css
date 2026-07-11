@@ -1,0 +1,302 @@
+/* =========================================
+   Custom Precision CAD Crosshair Cursor
+========================================= */
+
+.precision-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 100000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.precision-cursor.visible {
+  opacity: 1;
+}
+
+/* =========================================
+   Horizontal Line
+========================================= */
+
+.crosshair-h {
+  position: absolute;
+  width: 40px;
+  height: 1px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  background: var(--accent-primary);
+  opacity: 0.75;
+
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+/* =========================================
+   Vertical Line
+========================================= */
+
+.crosshair-v {
+  position: absolute;
+  width: 1px;
+  height: 40px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  background: var(--accent-primary);
+  opacity: 0.75;
+
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+/* =========================================
+   Center Circle
+========================================= */
+
+.crosshair-circle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center;
+
+  border: 1px solid var(--accent-primary);
+  border-radius: 50%;
+  background: transparent;
+
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-width var(--transition-fast);
+}
+
+/* =========================================
+   Center Dot
+========================================= */
+
+.crosshair-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  background: #fff;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* =========================================
+   Coordinates Box
+========================================= */
+
+.crosshair-coords {
+  position: absolute;
+  left: calc(50% + 14px);
+  top: calc(50% + 14px);
+
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+
+  background: rgba(var(--bg-color-rgb), 0.85);
+  border: 1px solid var(--border-color);
+
+  padding: 4px 6px;
+  white-space: nowrap;
+
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* =========================================
+   Hover State
+========================================= */
+
+.precision-cursor.hovering .crosshair-circle {
+  transform: translate(-50%, -50%) scale(1.6);
+
+  background: var(--accent-glow);
+  border-width: 1.5px;
+  border-color: var(--accent-secondary);
+
+  box-shadow:
+    0 0 8px var(--accent-glow),
+    0 0 16px var(--accent-glow);
+}
+
+.precision-cursor.hovering .crosshair-h,
+.precision-cursor.hovering .crosshair-v {
+  background: var(--accent-secondary);
+  opacity: 0.9;
+}
+
+/* =========================================
+   Lucide SVG Icon Harmonization Reset
+========================================= */
+
+/* Ensure Lucide SVG icons scale, align, and color consistently */
+svg.lucide,
+.lucide {
+  display: inline-block;
+  vertical-align: -0.15em;
+  stroke: currentColor;
+  stroke-width: 2px;
+  fill: none;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Bullet list icons in About section */
+.bullet-icon.lucide {
+  stroke: var(--accent-primary);
+  stroke-width: 3px;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Experience Tab Buttons */
+.experience-tab-btn .lucide {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: -0.15em;
+}
+
+/* Stat Cards in About section */
+.stat-icon .lucide {
+  width: 24px;
+  height: 24px;
+  stroke: var(--accent-primary);
+  stroke-width: 2px;
+}
+
+/* GitHub Stats KPI Cards */
+.kpi-icon .lucide {
+  width: 22px;
+  height: 22px;
+  stroke: var(--accent-primary);
+  stroke-width: 2px;
+}
+
+/* Project Cards Star rating */
+.project-stars .lucide {
+  width: 14px;
+  height: 14px;
+  stroke: var(--accent-primary);
+  fill: var(--accent-primary);
+  vertical-align: -0.1em;
+  margin-right: 2px;
+}
+
+/* Contact Detail Cards Channel Icons */
+.detail-icon .lucide {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent-primary);
+  stroke-width: 2px;
+}
+
+/* Contact success Sparkles icon */
+.alert-icon .lucide {
+  width: 20px;
+  height: 20px;
+  stroke: #10b981;
+  stroke-width: 2px;
+}
+
+/* Footer Zap indicator */
+.footer-zap.lucide {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-primary);
+  fill: var(--accent-primary);
+  vertical-align: -0.1em;
+}
+
+/* Back to Top Arrow */
+.back-to-top .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5px;
+  vertical-align: middle;
+}
+
+/* Fallback Widget headers and lists */
+.fallback-title .lucide {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  stroke: var(--accent-primary);
+  vertical-align: -0.15em;
+}
+
+.trophy-fallback-item .lucide {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  stroke: var(--accent-primary);
+  vertical-align: -0.1em;
+}
+
+/* =========================================
+   Empty / Error States
+========================================= */
+
+.no-projects-text,
+.skills-no-results,
+.error-text {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 40px 0;
+}
+
+/* =========================================
+   Reduced Motion Preference
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .bg-glow-spot {
+    animation: none !important;
+  }
+
+  .animate-fade-in {
+    animation: none !important;
+    opacity: 1;
+  }
+}

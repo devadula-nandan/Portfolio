@@ -118,6 +118,75 @@ export const resumeData = {
   }
 };
 
+/**
+ * About-section chat assistant content — keyword-matched canned responses.
+ * `reply` receives `resumeData.user` so entries can interpolate live contact
+ * info / links. First matching entry (in order) wins, same as the original
+ * if/else chain this replaced.
+ */
+export const chatResponses = [
+  {
+    keywords: ['yourself', 'who are you', 'bio', 'introduction', 'about me'],
+    reply: () => `I am Nandan Devadula, a Frontend Developer at IBM Kochi. I specialize in building enterprise-grade design systems, accessible Web Components, and scalable modular libraries. I bridge the gap between design concepts and production-ready, WCAG-compliant frontend implementations.`
+  },
+  {
+    keywords: ['ibm', 'carbon', 'labs', 'design system'],
+    reply: () => `At IBM, I work with the <strong>Carbon Design System</strong> team. I develop accessible, enterprise-grade components for <em>Carbon for IBM Products</em> and <em>Carbon for AI</em>, write high-coverage unit & E2E tests (Playwright, Jest), and prototype new UI paradigms in Carbon Labs.`
+  },
+  {
+    keywords: ['stack', 'tech', 'skill', 'framework', 'react', 'lit', 'typescript'],
+    reply: () => `My technical stack is centered around frontend engineering:
+        <ul>
+          <li><strong>Languages:</strong> JavaScript, TypeScript, CSS/SCSS, HTML5</li>
+          <li><strong>UI Frameworks:</strong> Web Components (Lit, native), React.js, Redux</li>
+          <li><strong>Testing/A11y:</strong> Jest, Cypress, Playwright, WCAG, WAI-ARIA</li>
+          <li><strong>Enterprise:</strong> Carbon Design System, Tailwind CSS</li>
+        </ul>`
+  },
+  {
+    keywords: ['contact', 'email', 'phone', 'hire', 'reach', 'cv', 'resume'],
+    reply: (user) => `You can reach me directly at <a href="mailto:${user.contact.email}" class="chat-link">${user.contact.email}</a> or call me at <strong>${user.contact.phone}</strong>. You can also view and download my official resume here: <a href="${user.cv}" target="_blank" rel="noopener noreferrer" class="chat-link">View CV <i data-lucide="external-link"></i></a>.`
+  },
+  {
+    keywords: ['experience', 'work', 'hcl', 'history', 'job'],
+    reply: () => `I have over <strong>5 years</strong> of professional experience:
+        <ul>
+          <li><strong>IBM</strong> (2023 - Present): Frontend Developer on Carbon Design System.</li>
+          <li><strong>HCL Technologies</strong> (2022 - 2023): Software Engineer building dashboard UIs & REST APIs.</li>
+          <li><strong>Ochre Media</strong> (2021 - 2022): Web UI Developer creating client microsites.</li>
+        </ul>`
+  },
+  {
+    keywords: ['a11y', 'accessib', 'wcag', 'screen reader', 'aria'],
+    reply: () => `I am an <strong>Accessibility Advocate</strong>. I design components compliant with WCAG 2.1 AA/AAA standards, meaning I build proper keyboard navigation, manage interactive focus outlines, ensure high-contrast colors, and implement semantic WAI-ARIA roles.`
+  },
+  {
+    keywords: ['project', 'repo', 'code', 'github', 'wc-'],
+    reply: (user) => `I have created over 40 GitHub repositories! Highlights include:
+        <ul>
+          <li><strong>wc-audio-input:</strong> Audio input web component supporting speech-to-text.</li>
+          <li><strong>wc-resizer:</strong> Lightweight container layout resizer.</li>
+          <li><strong>storybook-theme-carbon:</strong> Themes matching IBM's Carbon aesthetics.</li>
+        </ul>
+        Check them out in the Projects section below or visit my <a href="${user.social.github}" target="_blank" class="chat-link">GitHub Profile</a>.`
+  },
+  {
+    keywords: ['education', 'college', 'degree', 'university', 'graduate'],
+    reply: () => `I hold a <strong>Bachelor of Engineering (B.E.)</strong> in Electronics & Communication from Andhra University (Gayatri Vidya Parishad College), and a certificate in Software Development from Great Learning.`
+  },
+  {
+    keywords: ['hello', 'hi', 'hey', 'greet', 'greetings'],
+    reply: () => `Hello! How can I help you? Ask me about my work at IBM Carbon, my software engineering experience, skills, or projects.`
+  }
+];
+
+export const chatFallbackResponse = `Interesting question! I am specialized to talk about my tech stack, IBM design systems contributions, projects, and career history. Try asking:
+      <br/>- <em>"What is your tech stack?"</em>
+      <br/>- <em>"What do you do at IBM?"</em>
+      <br/>- <em>"How can I contact you?"</em>`;
+
+export const chatGreeting = "Hi! I am Nandan's virtual assistant. Ask me anything about my frontend engineering background, open-source work at IBM Carbon, or skills!";
+
 export const reposData = [
   {
     "name": "wc-audio-input",
