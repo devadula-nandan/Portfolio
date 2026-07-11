@@ -3,7 +3,9 @@ import { resumeData, chatResponses, chatFallbackResponse, chatGreeting } from '.
 // Serverless proxy (Vercel) that calls Gemini on the assistant's behalf.
 // See chat-proxy/api/chat.js.
 const CHAT_API_URL = 'https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat';
+const HEALTH_API_URL = CHAT_API_URL.replace(/\/chat$/, '/health');
 const CHAT_API_TIMEOUT_MS = 8000;
+const HEALTH_CHECK_TIMEOUT_MS = 4000;
 
 export class PortfolioAbout extends HTMLElement {
   connectedCallback() {
@@ -16,10 +18,36 @@ export class PortfolioAbout extends HTMLElement {
     const inputForm = this.querySelector('#chat-input-form');
     const userInput = this.querySelector('#chat-user-input');
     const chips = this.querySelectorAll('.chat-chip');
+    const statusDot = this.querySelector('#chat-status-dot');
+    const statusText = this.querySelector('#chat-status-text');
 
     if (!messagesContainer || !inputForm || !userInput) return;
 
     const user = resumeData.user;
+
+    // Reflects whether replies are actually coming from Gemini ('online') or
+    // the local keyword-matched fallback ('local') — not just decorative.
+    const setChatStatus = (state) => {
+      if (!statusDot || !statusText) return;
+      statusDot.classList.toggle('is-local', state === 'local');
+      statusText.textContent = state === 'online' ? 'AGENT_ONLINE' : 'LOCAL_MODE';
+    };
+
+    const checkChatHealth = async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS);
+      try {
+        const res = await fetch(HEALTH_API_URL, { signal: controller.signal });
+        const data = await res.json();
+        setChatStatus(res.ok && data.ok ? 'online' : 'local');
+      } catch (err) {
+        setChatStatus('local');
+      } finally {
+        clearTimeout(timeout);
+      }
+    };
+
+    checkChatHealth();
 
     const getBotResponse = (query) => {
       const q = query.toLowerCase().trim();
@@ -116,10 +144,12 @@ export class PortfolioAbout extends HTMLElement {
       let reply;
       try {
         reply = await getAiResponse(queryText);
+        setChatStatus('online');
       } catch (err) {
         // Proxy unreachable, rate-limited, or slow — fall back to local answers
         // so the widget never looks broken.
         reply = getBotResponse(queryText);
+        setChatStatus('local');
       }
 
       typingDiv.remove();
@@ -213,8 +243,8 @@ export class PortfolioAbout extends HTMLElement {
                     </div>
                   </div>
                   <div class="chat-status">
-                    <span class="chat-status-dot"></span>
-                    <span>AGENT_ONLINE</span>
+                    <span class="chat-status-dot" id="chat-status-dot"></span>
+                    <span id="chat-status-text">CONNECTING...</span>
                   </div>
                 </div>
                 

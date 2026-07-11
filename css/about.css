@@ -234,6 +234,14 @@
   animation: pulse 2s infinite ease-in-out;
 }
 
+/* Shown when Gemini is unreachable and the widget has fallen back to local
+   keyword-matched answers — distinguishes it from the live AGENT_ONLINE state. */
+.chat-status-dot.is-local {
+  background: #f5a623;
+  box-shadow: 0 0 6px rgba(245, 166, 35, 0.6);
+  animation: none;
+}
+
 .chat-body {
   padding: 24px;
   display: flex;
