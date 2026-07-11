@@ -169,6 +169,11 @@
   height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
+  /* .card's translucent glass background lets the page behind bleed
+     through once this fills the viewport — go fully opaque instead. */
+  background: var(--bg-color);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .chat-panel {

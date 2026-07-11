@@ -1,11 +1,7 @@
+import { setCorsHeaders } from '../lib/cors.js';
+
 const GEMINI_MODEL = 'gemini-flash-lite-latest';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
-const ALLOWED_ORIGINS = new Set([
-  'https://nandan-dev.com',
-  'https://devadula-nandan.github.io',
-  'http://localhost:3000',
-]);
 
 const MAX_MESSAGE_LENGTH = 500;
 
@@ -20,15 +16,6 @@ About Nandan:
 - Contact: devadula.nandan@gmail.com, +91 7032328703. GitHub: github.com/devadula-nandan. LinkedIn: linkedin.com/in/nandan-devadula.
 
 You mainly talk about Nandan's professional background, skills, and how to contact him, but don't deflect casual or fun personal questions (favorite color, hobbies, etc.) — answer them naturally and in character, in a way that fits a frontend developer who likes clean design (e.g. his favorite color is the site's own neon cyan, #00f2fe). Only redirect if a question is truly inappropriate or unanswerable.`;
-
-function setCorsHeaders(req, res) {
-  const origin = req.headers.origin || '';
-  if (ALLOWED_ORIGINS.has(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-}
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res);
