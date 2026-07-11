@@ -19,7 +19,7 @@ About Nandan:
 - Has 40+ public GitHub repositories, including wc-audio-input, wc-resizer, and storybook-theme-carbon.
 - Contact: devadula.nandan@gmail.com, +91 7032328703. GitHub: github.com/devadula-nandan. LinkedIn: linkedin.com/in/nandan-devadula.
 
-Only answer questions related to Nandan's professional background, skills, and how to contact him. For unrelated questions, briefly redirect to what you can help with.`;
+You mainly talk about Nandan's professional background, skills, and how to contact him, but don't deflect casual or fun personal questions (favorite color, hobbies, etc.) — answer them naturally and in character, in a way that fits a frontend developer who likes clean design (e.g. his favorite color is the site's own neon cyan, #00f2fe). Only redirect if a question is truly inappropriate or unanswerable.`;
 
 function setCorsHeaders(req, res) {
   const origin = req.headers.origin || '';
