@@ -1,8 +1,5 @@
 {
   "name": "portfolio-chat-proxy",
   "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "@google/genai": "^2.11.0"
-  }
+  "private": true
 }

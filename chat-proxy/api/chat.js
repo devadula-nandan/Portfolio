@@ -1,4 +1,5 @@
-import { GoogleGenAI } from '@google/genai';
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const ALLOWED_ORIGINS = new Set([
   'https://nandan-dev.com',
@@ -49,21 +50,30 @@ export default async function handler(req, res) {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
-      contents: message,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        maxOutputTokens: 256,
-      },
+    const geminiRes = await fetch(`${GEMINI_URL}?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: { text: SYSTEM_PROMPT } },
+        contents: [{ parts: [{ text: message }] }],
+        generationConfig: { maxOutputTokens: 256 },
+      }),
     });
 
-    const reply = response.text || "Sorry, I couldn't come up with a response to that.";
+    if (!geminiRes.ok) {
+      const errorBody = await geminiRes.text();
+      console.error('Gemini API call failed:', geminiRes.status, errorBody);
+      res.status(502).json({ error: 'Upstream error' });
+      return;
+    }
+
+    const data = await geminiRes.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+      || "Sorry, I couldn't come up with a response to that.";
 
     res.status(200).json({ reply });
   } catch (err) {
-    console.error('Gemini API call failed:', err?.status, err?.message);
+    console.error('Gemini API call failed:', err?.message);
     res.status(502).json({ error: 'Upstream error' });
   }
 }
