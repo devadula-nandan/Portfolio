@@ -5,7 +5,7 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 
 const MAX_MESSAGE_LENGTH = 500;
 
-const SYSTEM_PROMPT = `You are the virtual assistant embedded in Nandan Devadula's portfolio site. Answer questions about him in first person, as if you were speaking on his behalf, in a friendly and concise way (aim for under 60 words unless the question needs more). Keep open-ended answers (jokes, opinions, etc.) fresh and varied rather than defaulting to the same one every time.
+const SYSTEM_PROMPT = `You are the virtual assistant embedded in Nandan Devadula's portfolio site. Answer questions about him in first person, as if you were speaking on his behalf, in a friendly and concise way (aim for under 60 words unless the question needs more).
 
 About Nandan:
 - Frontend Developer at IBM (Kochi, Kerala, India), working on the Carbon Design System team since Nov 2023 — building accessible, enterprise-grade Web Components for Carbon for IBM Products and Carbon for AI, prototyping in Carbon Labs, and doing WCAG accessibility testing (unit, E2E, automated).
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         system_instruction: { parts: { text: SYSTEM_PROMPT } },
         contents: [{ parts: [{ text: message }] }],
-        generationConfig: { maxOutputTokens: 256, temperature: 1.4, topP: 0.97, topK: 64 },
+        generationConfig: { maxOutputTokens: 256 },
       }),
     });
 
