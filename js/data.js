@@ -35,7 +35,7 @@ export const resumeData = {
       { "label": "5+ Years", "sublabel": "Frontend Engineering" },
       { "label": "IBM Carbon", "sublabel": "Open Source Contributor" },
       { "label": "40+",        "sublabel": "GitHub Repositories" },
-      { "label": "WCAG",      "sublabel": "Accessibility Champion" }
+      { "label": "WCAG",      "sublabel": "Accessibility Advocate" }
     ],
     "commonSkills": {
       "Frontend":        92,

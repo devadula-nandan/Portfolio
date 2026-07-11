@@ -5,6 +5,8 @@ export class PortfolioProjects extends HTMLElement {
     super();
     this.projects = [];
     this.activeFilter = 'all';
+    this.currentPage = 1;
+    this.itemsPerPage = 6;
   }
 
   async connectedCallback() {
@@ -68,38 +70,47 @@ export class PortfolioProjects extends HTMLElement {
           </div>
 
           <div class="projects-grid" id="projects-grid">
-            ${this.getFilteredProjectsHTML()}
+            <!-- Projects injected dynamically -->
+          </div>
+
+          <div class="projects-pagination" id="projects-pagination">
+            <!-- Pagination injected dynamically -->
           </div>
         </div>
       </section>
     `;
+    this.updateProjectsDisplay();
   }
 
-  getFilteredProjectsHTML() {
-    const filtered = this.projects.filter(project => {
+  getFilteredProjects() {
+    return this.projects.filter(project => {
       if (this.activeFilter === 'all') return true;
       const lang = (project.lang || '').toLowerCase();
       const name = project.name.toLowerCase();
-      
+      const topics = (project.topics || []).map(t => t.toLowerCase());
+      const hasTopic = (...keys) => topics.some(t => keys.some(k => t.includes(k)));
+
       if (this.activeFilter === 'frameworks') {
-        return name.includes('react') || name.includes('vue') || lang === 'vue';
+        return name.includes('react') || name.includes('vue') || lang === 'vue' || hasTopic('react', 'vue');
       }
       if (this.activeFilter === 'components') {
-        return name.startsWith('wc-') || project.topics.includes('web-components');
+        return name.startsWith('wc-') || hasTopic('web-components');
       }
       if (this.activeFilter === 'backend') {
-        return lang === 'python' || lang === 'flask' || name.includes('api') || name.includes('automation');
+        return lang === 'python' || lang === 'flask' || name.includes('api') || name.includes('automation') || hasTopic('flask', 'python', 'express');
       }
       return true;
     });
+  }
 
-    if (filtered.length === 0) {
+  getFilteredProjectsHTML(itemsToShow) {
+    if (itemsToShow.length === 0) {
       return `<p class="no-projects-text">No projects found in this category.</p>`;
     }
 
-    return filtered.map(p => {
-      const liveLinkBtn = p.homepage 
-        ? `<a href="${p.homepage}" target="_blank" class="btn btn-primary btn-sm-card">
+    return itemsToShow.map(p => {
+      const liveLinkBtn = p.homepage
+        ? `<a href="${p.homepage}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm-card">
              Live Demo
              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
            </a>`
@@ -129,14 +140,113 @@ export class PortfolioProjects extends HTMLElement {
           
           <div class="project-card-actions">
             ${liveLinkBtn}
-            <a href="${p.url}" target="_blank" class="btn btn-secondary btn-sm-card">
-              Code base
+            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm-card">
+              Source Code
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
             </a>
           </div>
         </div>
       `;
     }).join('');
+  }
+
+  updateProjectsDisplay() {
+    const grid = this.querySelector('#projects-grid');
+    const paginationContainer = this.querySelector('#projects-pagination');
+    if (!grid || !paginationContainer) return;
+
+    const filtered = this.getFilteredProjects();
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / this.itemsPerPage);
+
+    // Clamp current page to valid range
+    if (this.currentPage > totalPages) {
+      this.currentPage = Math.max(1, totalPages);
+    }
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    const paginatedItems = filtered.slice(startIndex, endIndex);
+
+    grid.innerHTML = this.getFilteredProjectsHTML(paginatedItems);
+    
+    // Render pagination controls only if total pages > 1
+    if (totalPages > 1) {
+      paginationContainer.style.display = 'flex';
+      
+      let paginationHTML = `
+        <button class="btn btn-secondary btn-pagination" id="prev-page-btn" ${this.currentPage === 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"' : ''} aria-label="Previous Page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      `;
+
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <button class="filter-btn btn-pagination-num ${this.currentPage === i ? 'active' : ''}" data-page="${i}" aria-label="Page ${i}">
+            ${i}
+          </button>
+        `;
+      }
+
+      paginationHTML += `
+        <button class="btn btn-secondary btn-pagination" id="next-page-btn" ${this.currentPage === totalPages ? 'disabled style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"' : ''} aria-label="Next Page">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      `;
+
+      paginationContainer.innerHTML = paginationHTML;
+
+      // Add listeners to page numbers
+      const pageBtns = this.querySelectorAll('.btn-pagination-num');
+      pageBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.currentPage = parseInt(btn.getAttribute('data-page'));
+          this.updateProjectsDisplay();
+          this.scrollIntoGridTop();
+        });
+      });
+
+      // Add listener to prev button
+      const prevBtn = this.querySelector('#prev-page-btn');
+      if (prevBtn && this.currentPage > 1) {
+        prevBtn.addEventListener('click', () => {
+          this.currentPage--;
+          this.updateProjectsDisplay();
+          this.scrollIntoGridTop();
+        });
+      }
+
+      // Add listener to next button
+      const nextBtn = this.querySelector('#next-page-btn');
+      if (nextBtn && this.currentPage < totalPages) {
+        nextBtn.addEventListener('click', () => {
+          this.currentPage++;
+          this.updateProjectsDisplay();
+          this.scrollIntoGridTop();
+        });
+      }
+    } else {
+      paginationContainer.style.display = 'none';
+      paginationContainer.innerHTML = '';
+    }
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  }
+
+  scrollIntoGridTop() {
+    const target = this.querySelector('#projects');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   getLangColor(lang) {
@@ -153,16 +263,14 @@ export class PortfolioProjects extends HTMLElement {
 
   setupFilters() {
     const filters = this.querySelectorAll('.filter-btn');
-    const grid = this.querySelector('#projects-grid');
     
     filters.forEach(btn => {
       btn.addEventListener('click', () => {
         filters.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.activeFilter = btn.getAttribute('data-filter');
-        
-        // Re-render project cards inside the grid
-        grid.innerHTML = this.getFilteredProjectsHTML();
+        this.currentPage = 1;
+        this.updateProjectsDisplay();
       });
     });
   }

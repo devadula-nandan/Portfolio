@@ -81,13 +81,16 @@ export class PortfolioContact extends HTMLElement {
                   Send Message
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
+                <p class="form-hint">Submitting opens your email app with the message pre-filled — nothing is stored on this site.</p>
               </form>
-              
-              <div class="form-success-alert card" id="success-alert" style="display: none;">
+
+              <div class="form-success-alert card" id="success-alert" style="display: none;" role="status">
                 <span class="alert-icon"><i data-lucide="sparkles"></i></span>
                 <div class="alert-message">
-                  <h4>Message Sent Successfully!</h4>
-                  <p>Thank you for reaching out. I'll get back to you shortly.</p>
+                  <h4>Almost there — check your email app!</h4>
+                  <p>Your message has been drafted in your email client. Just hit send.
+                     If nothing opened, email me directly at
+                     <a href="mailto:${user.contact.email}" class="alert-mail-link">${user.contact.email}</a>.</p>
                 </div>
               </div>
             </div>
@@ -150,17 +153,17 @@ export class PortfolioContact extends HTMLElement {
       }
 
       if (isValid) {
-        // Mock successful form submission
+        // Compose the message in the visitor's email client (static site — no backend)
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const message = messageInput.value.trim();
+
+        const subject = encodeURIComponent(`Portfolio contact from ${name}`);
+        const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+        window.location.href = `mailto:${resumeData.user.contact.email}?subject=${subject}&body=${body}`;
+
         form.style.display = 'none';
         successAlert.style.display = 'flex';
-        
-        console.log('Form submitted successfully:', {
-          name: nameInput.value.trim(),
-          email: emailInput.value.trim(),
-          message: messageInput.value.trim()
-        });
-
-        // Reset form inputs
         form.reset();
       }
     });

@@ -18,6 +18,10 @@ console.log(
 
 // Global Interactive Visual Animations
 document.addEventListener('DOMContentLoaded', () => {
+  // Custom pointer features (mouse glow, crosshair cursor, drag marquee) are
+  // for precise pointers only — completely disabled on touch / coarse devices.
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   // 1. Scroll Progress Bar
   const scrollBar = document.getElementById('scroll-bar');
   if (scrollBar) {
@@ -34,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2. Dynamic Mouse-Following Glow Effect
   const mouseGlow = document.getElementById('mouse-glow');
-  if (mouseGlow) {
+  if (isFinePointer && mouseGlow) {
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let glowX = mouseX;
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Precision CAD Crosshair Cursor
   const precisionCursor = document.getElementById('precision-cursor');
   const crosshairCoords = document.getElementById('crosshair-coords');
-  if (precisionCursor && crosshairCoords) {
+  if (isFinePointer && precisionCursor && crosshairCoords) {
     let mouseX = 0;
     let mouseY = 0;
 
@@ -101,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 4. Randomize Blueprint Border Protrusion Lengths (Hand-drawn schematic effect)
-  const BLUEPRINT_SELECTOR = '.card, .project-card, .timeline-card, .widget-fallback-card, .contact-detail-card, .hero-badge, .btn, .filter-btn, .hero-image-wrapper, .nav-link, .skills-search-wrapper, .timeline-dot';
+  const BLUEPRINT_SELECTOR = '.card, .project-card, .timeline-card, .widget-fallback-card, .contact-detail-card, .hero-badge, .btn, .filter-btn, .hero-image-wrapper, .nav-link, .timeline-dot';
 
   const randomizeElementBorders = (el) => {
     if (el.dataset.protrusionsSet) return;
@@ -175,4 +179,67 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
     }
   }, { passive: true });
+
+  // 6. Windows-style Click-Drag Selection Marquee
+  const selectionRect = document.getElementById('selection-rect');
+  if (isFinePointer && selectionRect) {
+    const INTERACTIVE = 'a, button, input, textarea, select, label, [contenteditable="true"]';
+    const DRAG_THRESHOLD = 4; // px before the rectangle appears (so a click doesn't flash it)
+
+    let isSelecting = false;
+    let startX = 0;
+    let startY = 0;
+
+    document.addEventListener('mousedown', (e) => {
+      // Left button only; leave interactive elements to their native behavior
+      if (e.button !== 0 || (e.target.closest && e.target.closest(INTERACTIVE))) return;
+
+      // Restrict drawing marquee to empty/background spaces so text selection is preserved on content
+      const CONTENT_AND_CARDS = 'p, h1, h2, h3, h4, h5, h6, li, ul, ol, .card, .project-card, .timeline-card, .telemetry-card, .pillar-card, .chat-message, .skill-chip, .project-tag-badge, .timeline-tag, code, pre, i, svg, figcaption';
+      if (e.target.closest && e.target.closest(CONTENT_AND_CARDS)) return;
+
+      isSelecting = true;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      // Deselect any focused field and suppress the browser's default
+      // text-selection / image-drag so the drag is purely a marquee
+      if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isSelecting) return;
+
+      const left = Math.min(e.clientX, startX);
+      const top = Math.min(e.clientY, startY);
+      const width = Math.abs(e.clientX - startX);
+      const height = Math.abs(e.clientY - startY);
+
+      // Only reveal the rectangle once the pointer has actually dragged
+      if (!selectionRect.classList.contains('active')) {
+        if (width < DRAG_THRESHOLD && height < DRAG_THRESHOLD) return;
+        selectionRect.classList.add('active');
+      }
+
+      selectionRect.style.left = `${left}px`;
+      selectionRect.style.top = `${top}px`;
+      selectionRect.style.width = `${width}px`;
+      selectionRect.style.height = `${height}px`;
+    }, { passive: true });
+
+    const endSelection = () => {
+      if (!isSelecting) return;
+      isSelecting = false;
+      selectionRect.classList.remove('active');
+      selectionRect.style.width = '0px';
+      selectionRect.style.height = '0px';
+    };
+
+    window.addEventListener('mouseup', endSelection);
+    document.addEventListener('mouseleave', endSelection);
+    window.addEventListener('blur', endSelection);
+  }
 });

@@ -9,7 +9,7 @@ export class PortfolioHeader extends HTMLElement {
     this.innerHTML = `
       <header class="portfolio-header">
         <div class="container header-container">
-          <a href="#" class="logo">
+          <a href="#home" class="logo" aria-label="Back to top">
             <span class="logo-text">Nandan.D</span>
           </a>
           
@@ -44,7 +44,7 @@ export class PortfolioHeader extends HTMLElement {
               </svg>
             </button>
             
-            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle Menu">
+            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle Menu" aria-expanded="false" aria-controls="nav-menu">
               <span></span>
               <span></span>
               <span></span>
@@ -56,17 +56,20 @@ export class PortfolioHeader extends HTMLElement {
   }
 
   initTheme() {
-    const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
+    // Saved preference wins; otherwise follow the OS color scheme
+    const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    const savedTheme = localStorage.getItem('portfolio-theme') || systemTheme;
     document.documentElement.setAttribute('data-theme', savedTheme);
     this.updateThemeUI(savedTheme);
   }
 
   updateThemeUI(theme) {
     const toggleBtn = this.querySelector('#theme-toggle');
-    if (theme === 'light') {
-      toggleBtn.classList.add('light-active');
-    } else {
-      toggleBtn.classList.remove('light-active');
+    toggleBtn.classList.toggle('light-active', theme === 'light');
+    toggleBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', theme === 'light' ? '#f8fafc' : '#0a0e17');
     }
   }
 
@@ -83,22 +86,67 @@ export class PortfolioHeader extends HTMLElement {
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('portfolio-theme', newTheme);
       this.updateThemeUI(newTheme);
+      // Notify components that render theme-dependent assets
+      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
     });
 
+    const closeMenu = () => {
+      mobileToggle.classList.remove('active');
+      navMenu.classList.remove('active');
+      document.body.classList.remove('no-scroll');
+      mobileToggle.setAttribute('aria-expanded', 'false');
+    };
+
     // Mobile menu toggle
-    mobileToggle.addEventListener('click', () => {
-      mobileToggle.classList.toggle('active');
-      navMenu.classList.toggle('active');
-      document.body.classList.toggle('no-scroll');
+    mobileToggle.addEventListener('click', (e) => {
+      const isOpen = navMenu.classList.toggle('active');
+      mobileToggle.classList.toggle('active', isOpen);
+      document.body.classList.toggle('no-scroll', isOpen);
+      mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      e.stopPropagation(); // Avoid immediately triggering click-outside
     });
 
     // Close menu when a link is clicked
     navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        mobileToggle.classList.remove('active');
-        navMenu.classList.remove('active');
-        document.body.classList.remove('no-scroll');
-      });
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Close menu on click outside the header menu
+    document.addEventListener('click', (e) => {
+      if (navMenu.classList.contains('active')) {
+        if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+          closeMenu();
+        }
+      }
+    });
+
+    // Keyboard navigation handlers (Escape to close, Tab to trap focus)
+    document.addEventListener('keydown', (e) => {
+      if (!navMenu.classList.contains('active')) return;
+
+      if (e.key === 'Escape') {
+        closeMenu();
+        mobileToggle.focus();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const focusables = [mobileToggle, themeBtn, ...Array.from(navLinks)];
+        const firstEl = focusables[0];
+        const lastEl = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            lastEl.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            firstEl.focus();
+            e.preventDefault();
+          }
+        }
+      }
     });
 
     // Add border scroll effect

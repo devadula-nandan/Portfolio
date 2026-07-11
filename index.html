@@ -3,28 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nandan Devadula | Portfolio</title>
-  
+  <title>Nandan Devadula | Frontend Developer</title>
+
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Personal portfolio website of Nandan Devadula - Frontend Developer specializing in modular React UI systems, Web Components, and contributions to IBM's Carbon Design System." />
-  <meta name="keywords" content="Nandan Devadula, Frontend Developer, React, Web Components, Carbon Design System, HCL, UI Developer" />
+  <meta name="description" content="Personal portfolio of Nandan Devadula — Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
+  <meta name="keywords" content="Nandan Devadula, Frontend Developer, React, Web Components, Carbon Design System, IBM, TypeScript, UI Developer" />
   <meta name="author" content="Nandan Devadula" />
-  
+  <meta name="theme-color" content="#0a0e17" />
+  <link rel="canonical" href="https://devadula-nandan.github.io/Portfolio/" />
+
   <!-- Open Graph / Social Meta Tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Nandan Devadula | Portfolio" />
-  <meta property="og:description" content="Frontend Developer specializing in modular React UI systems, Web Components, and IBM's Carbon Design System." />
-  <meta property="og:url" content="https://github.com/devadula-nandan" />
-  
+  <meta property="og:title" content="Nandan Devadula | Frontend Developer" />
+  <meta property="og:description" content="Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
+  <meta property="og:url" content="https://devadula-nandan.github.io/Portfolio/" />
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/47176249?s=400" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Nandan Devadula | Frontend Developer" />
+  <meta name="twitter:description" content="Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
+  <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/47176249?s=400" />
+
+  <!-- Fonts (preconnect + non-blocking discovery instead of CSS @import) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="index.css" />
-  
-  <!-- Favicon Mock (Fallback SVG representation) -->
+
+  <!-- Favicon (inline SVG) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 fill=%22none%22/><path d=%22M35 35 L20 50 L35 65 M65 35 L80 50 L65 65%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/></svg>">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Nandan Devadula",
+    "url": "https://devadula-nandan.github.io/Portfolio/",
+    "image": "https://avatars.githubusercontent.com/u/47176249?s=400",
+    "jobTitle": "Frontend Developer",
+    "worksFor": { "@type": "Organization", "name": "IBM" },
+    "sameAs": [
+      "https://github.com/devadula-nandan",
+      "https://www.linkedin.com/in/nandan-devadula"
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- Scroll Progress Indicator -->
-  <div class="scroll-progress-bar" id="scroll-bar">
+  <div class="scroll-progress-bar" id="scroll-bar" aria-hidden="true">
     <div class="scroll-progress-cursor">
       <div class="scroll-progress-cursor-h"></div>
       <div class="scroll-progress-cursor-v"></div>
@@ -32,7 +63,7 @@
   </div>
 
   <!-- Precision CAD Crosshair Cursor -->
-  <div class="precision-cursor" id="precision-cursor">
+  <div class="precision-cursor" id="precision-cursor" aria-hidden="true">
     <div class="crosshair-h"></div>
     <div class="crosshair-v"></div>
     <div class="crosshair-circle"></div>
@@ -40,8 +71,11 @@
     <div class="crosshair-coords" id="crosshair-coords">X: 0px<br>Y: 0px</div>
   </div>
 
+  <!-- Windows-style click-drag selection marquee -->
+  <div class="selection-rect" id="selection-rect" aria-hidden="true"></div>
+
   <!-- Fixed Background Canvas -->
-  <div class="portfolio-background">
+  <div class="portfolio-background" aria-hidden="true">
     <div class="bg-glow-spot bg-glow-1"></div>
     <div class="bg-glow-spot bg-glow-2"></div>
     <div class="bg-glow-spot bg-glow-3"></div>
@@ -50,7 +84,7 @@
 
   <!-- Custom Navigation Header -->
   <portfolio-header></portfolio-header>
-  
+
   <!-- Main Contents -->
   <main>
     <portfolio-hero></portfolio-hero>
@@ -61,13 +95,25 @@
     <github-stats></github-stats>
     <portfolio-contact></portfolio-contact>
   </main>
-  
+
   <!-- Footer -->
   <portfolio-footer></portfolio-footer>
-  
-  <!-- Lucide Icon Library -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
+
+  <!-- No-JS fallback -->
+  <noscript>
+    <div style="max-width: 640px; margin: 15vh auto; padding: 0 24px; font-family: system-ui, sans-serif; text-align: center;">
+      <h1>Nandan Devadula — Frontend Developer</h1>
+      <p>This portfolio requires JavaScript to render. In the meantime, you can find me on
+        <a href="https://github.com/devadula-nandan" style="color:#00f2fe;">GitHub</a> or
+        <a href="https://www.linkedin.com/in/nandan-devadula" style="color:#00f2fe;">LinkedIn</a>,
+        or reach me at <a href="mailto:devadula.nandan@gmail.com" style="color:#00f2fe;">devadula.nandan@gmail.com</a>.
+      </p>
+    </div>
+  </noscript>
+
+  <!-- Lucide Icon Library (pinned version) -->
+  <script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js" defer></script>
+
   <!-- Main Application Script (ES module) -->
   <script type="module" src="js/app.js"></script>
 </body>

@@ -24,8 +24,54 @@ function parseReadmeData(readmeText) {
  * Falls back to local data.js if any fetch fails.
  *
  * Schema v2: supports headline, highlights[], experience[].tags, experience[].location
+ *
+ * The result is memoized so multiple components share a single set of
+ * network requests instead of each re-fetching the GitHub API.
  */
-export async function getPortfolioData() {
+let portfolioDataPromise = null;
+
+export function getPortfolioData() {
+  if (portfolioDataPromise) {
+    return portfolioDataPromise;
+  }
+
+  const CACHE_KEY = 'nandan_portfolio_cache_v2';
+  const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.timestamp && parsed.data && (Date.now() - parsed.timestamp < CACHE_TTL)) {
+        console.log(
+          '%c ⚡ GitHub Portfolio data loaded from local cache %c',
+          'background: #00f2fe; color: #0a0e17; padding: 2px 6px; font-weight: bold; border-radius: 4px;',
+          'background: transparent; color: inherit;'
+        );
+        portfolioDataPromise = Promise.resolve(parsed.data);
+        return portfolioDataPromise;
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading from localStorage cache:', e);
+  }
+
+  portfolioDataPromise = loadPortfolioData().then(data => {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        timestamp: Date.now(),
+        data: data
+      }));
+    } catch (e) {
+      console.warn('Error writing to localStorage cache:', e);
+    }
+    return data;
+  });
+
+  return portfolioDataPromise;
+}
+
+async function loadPortfolioData() {
   // Start with local fallback data
   const data = {
     profile: {
@@ -123,27 +169,16 @@ export async function getPortfolioData() {
           topics: repo.topics || []
         }));
 
-        // Merge: prefer static metadata descriptions + live star counts
-        const mergedProjects = [];
-
-        reposData.forEach(staticItem => {
+        // Keep the section curated: show only the hand-picked list from
+        // data.js, enriched with live star counts and links. Auto-appending
+        // every public repo buried the highlighted work under practice repos.
+        const mergedProjects = reposData.map(staticItem => {
           const liveItem = mappedRepos.find(
             r => r.name.toLowerCase() === staticItem.name.toLowerCase()
           );
-          mergedProjects.push(liveItem
+          return liveItem
             ? { ...staticItem, stars: liveItem.stars, homepage: liveItem.homepage || staticItem.homepage, url: liveItem.url }
-            : staticItem
-          );
-        });
-
-        // Add any remaining live repos not in our static curated list
-        mappedRepos.forEach(liveItem => {
-          const alreadyIn = mergedProjects.some(
-            p => p.name.toLowerCase() === liveItem.name.toLowerCase()
-          );
-          if (!alreadyIn && liveItem.desc && liveItem.name.toLowerCase() !== `${GITHUB_USERNAME}`) {
-            mergedProjects.push(liveItem);
-          }
+            : staticItem;
         });
 
         data.projects = mergedProjects;

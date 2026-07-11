@@ -74,21 +74,21 @@ export class PortfolioExperience extends HTMLElement {
             <p class="section-subtitle">A chronological summary of my professional milestones and educational background</p>
           </div>
           
-          <div class="experience-tabs">
-            <button class="experience-tab-btn active" data-target="professional">
+          <div class="experience-tabs" role="tablist" aria-label="Experience journey sections">
+            <button class="experience-tab-btn active" id="tab-professional" role="tab" aria-selected="true" aria-controls="timeline-professional" data-target="professional">
               <i data-lucide="briefcase"></i> Professional Work
             </button>
-            <button class="experience-tab-btn" data-target="academic">
+            <button class="experience-tab-btn" id="tab-academic" role="tab" aria-selected="false" aria-controls="timeline-academic" data-target="academic" tabindex="-1">
               <i data-lucide="graduation-cap"></i> Academic Background
             </button>
           </div>
           
-          <div class="timeline-container active" id="timeline-professional">
+          <div class="timeline-container active" id="timeline-professional" role="tabpanel" aria-labelledby="tab-professional" aria-hidden="false">
             <div class="timeline-line"></div>
             ${renderTimeline(professionalItems)}
           </div>
           
-          <div class="timeline-container" id="timeline-academic">
+          <div class="timeline-container" id="timeline-academic" role="tabpanel" aria-labelledby="tab-academic" aria-hidden="true">
             <div class="timeline-line"></div>
             ${renderTimeline(academicItems)}
           </div>
@@ -117,18 +117,44 @@ export class PortfolioExperience extends HTMLElement {
     const academicTimeline = this.querySelector('#timeline-academic');
 
     tabs.forEach(tab => {
+      // Mouse Click Interaction
       tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+          t.setAttribute('tabindex', '-1');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        tab.removeAttribute('tabindex');
 
         professionalTimeline.classList.remove('active');
+        professionalTimeline.setAttribute('aria-hidden', 'true');
         academicTimeline.classList.remove('active');
+        academicTimeline.setAttribute('aria-hidden', 'true');
 
         const target = tab.getAttribute('data-target');
         if (target === 'professional') {
           professionalTimeline.classList.add('active');
+          professionalTimeline.setAttribute('aria-hidden', 'false');
         } else {
           academicTimeline.classList.add('active');
+          academicTimeline.setAttribute('aria-hidden', 'false');
+        }
+      });
+
+      // Keyboard Arrow Key Navigation
+      tab.addEventListener('keydown', (e) => {
+        let nextTab = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          nextTab = tab.nextElementSibling || tabs[0];
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          nextTab = tab.previousElementSibling || tabs[tabs.length - 1];
+        }
+        if (nextTab && nextTab.classList.contains('experience-tab-btn')) {
+          nextTab.focus();
+          nextTab.click();
+          e.preventDefault();
         }
       });
     });

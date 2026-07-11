@@ -23,7 +23,7 @@ export class PortfolioFooter extends HTMLElement {
             Built with <i data-lucide="zap" class="footer-zap"></i> Vanilla Web Components, CSS3 Grid/Flexbox & GitHub API.
           </p>
           
-          <a href="#" class="back-to-top" aria-label="Scroll back to top">
+          <a href="#home" class="back-to-top" aria-label="Scroll back to top">
             <i data-lucide="arrow-up"></i>
           </a>
         </div>

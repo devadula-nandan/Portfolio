@@ -1,128 +1,72 @@
 import { resumeData } from '../data.js';
 
+/**
+ * Skills grouped into meaningful categories and shown as simple tags.
+ * No proficiency percentages — self-assigned skill percentages are subjective
+ * and read as filler; categorized tags are the clearer, professional convention.
+ *
+ * Skill names must match the keys in resumeData.user.specificSkills. Any skill
+ * present in the data but not listed here is collected into a "More" group, so
+ * nothing is silently dropped if the data changes.
+ */
+const SKILL_CATEGORIES = [
+  { title: 'Languages & Markup', icon: 'code', skills: ['JavaScript', 'TypeScript', 'HTML5', 'CSS / SCSS'] },
+  { title: 'Frameworks & Libraries', icon: 'layers', skills: ['React.js', 'Lit', 'Redux.js', 'Web Components'] },
+  { title: 'Design Systems & Styling', icon: 'palette', skills: ['Carbon Design System', 'Tailwind CSS', 'Bootstrap'] },
+  { title: 'Testing & Quality', icon: 'flask-conical', skills: ['Jest', 'Cypress', 'Playwright'] },
+  { title: 'Backend & Data', icon: 'database', skills: ['REST APIs', 'MySQL', 'Python'] },
+];
+
 export class PortfolioSkills extends HTMLElement {
   connectedCallback() {
     this.render();
-    this.setupSearch();
   }
 
   render() {
-    const user = resumeData.user;
-    
-    // Convert common skills object into HTML
-    const commonSkillsHTML = Object.entries(user.commonSkills).map(([skill, val]) => `
-      <div class="skill-progress-item">
-        <div class="skill-progress-info">
-          <span class="skill-name">${skill.charAt(0).toUpperCase() + skill.slice(1)}</span>
-          <span class="skill-percent">${val}%</span>
-        </div>
-        <div class="skill-progress-bar-container">
-          <div class="skill-progress-bar-fill" style="width: ${val}%;"></div>
+    const allSkills = Object.keys(resumeData.user.specificSkills || {});
+    const used = new Set();
+
+    // Keep only skills that actually exist in the data
+    const categories = SKILL_CATEGORIES
+      .map(cat => {
+        const skills = cat.skills.filter(s => allSkills.includes(s));
+        skills.forEach(s => used.add(s));
+        return { ...cat, skills };
+      })
+      .filter(cat => cat.skills.length);
+
+    // Surface any data skills we didn't explicitly categorize
+    const leftovers = allSkills.filter(s => !used.has(s));
+    if (leftovers.length) {
+      categories.push({ title: 'More', icon: 'sparkles', skills: leftovers });
+    }
+
+    const categoriesHTML = categories.map(cat => `
+      <div class="skill-category card">
+        <h3 class="skill-category-title">
+          <i data-lucide="${cat.icon}"></i>
+          ${cat.title}
+        </h3>
+        <div class="skill-chips">
+          ${cat.skills.map(s => `<span class="skill-chip">${s}</span>`).join('')}
         </div>
       </div>
     `).join('');
-
-    // Convert specific skills object into HTML cards with categories
-    const specificSkills = user.specificSkills;
-    
-    const specificSkillsHTML = Object.entries(specificSkills).map(([skill, val]) => {
-      // Categorize skills for styling icons or backgrounds
-      let category = 'frontend';
-      const lowercaseSkill = skill.toLowerCase();
-      if (['mysql', 'databases'].includes(lowercaseSkill)) {
-        category = 'database';
-      } else if (['python', 'express', 'flask', 'rest api'].includes(lowercaseSkill)) {
-        category = 'backend';
-      }
-
-      return `
-        <div class="skill-badge-card card" data-skill-name="${skill}" data-category="${category}">
-          <div class="skill-badge-header">
-            <span class="skill-badge-icon">${this.getSkillIcon(skill)}</span>
-            <span class="skill-badge-title">${skill}</span>
-          </div>
-          <div class="skill-badge-level">
-            <div class="skill-badge-fill" style="width: ${val}%;"></div>
-          </div>
-          <span class="skill-badge-percent">${val}%</span>
-        </div>
-      `;
-    }).join('');
 
     this.innerHTML = `
       <section class="skills-section" id="skills">
         <div class="container">
           <div class="section-header">
-            <h2 class="section-title">Skills & Toolkit</h2>
-            <p class="section-subtitle">A granular overview of my technical capabilities and proficiency levels</p>
+            <h2 class="section-title">Skills &amp; Toolkit</h2>
+            <p class="section-subtitle">The technologies and tools I reach for to build accessible, enterprise-grade interfaces</p>
           </div>
-          
-          <div class="skills-grid">
-            <div class="skills-column core-skills card">
-              <h3 class="skills-col-title">Core Competencies</h3>
-              <p class="skills-col-desc">High-level distribution of engineering domains based on projects and professional workload.</p>
-              <div class="skills-progress-list">
-                ${commonSkillsHTML}
-              </div>
-            </div>
-            
-            <div class="skills-column specific-skills">
-              <div class="skills-controls">
-                <h3 class="skills-col-title">Technologies & Frameworks</h3>
-                <div class="skills-search-wrapper">
-                  <input type="text" id="skills-search" placeholder="Search technologies (e.g. React, Express)..." class="skills-search-input" />
-                  <span class="search-icon"><i data-lucide="search"></i></span>
-                </div>
-              </div>
-              
-              <div class="skills-badges-container" id="skills-container">
-                ${specificSkillsHTML}
-              </div>
-            </div>
+
+          <div class="skills-categories">
+            ${categoriesHTML}
           </div>
         </div>
       </section>
     `;
-  }
-
-  getSkillIcon(skill) {
-    const s = skill.toLowerCase();
-    if (s.includes('html')) return '<i data-lucide="globe"></i>';
-    if (s.includes('css')) return '<i data-lucide="palette"></i>';
-    if (s.includes('javascript') || s.includes('js')) return '<i data-lucide="file-code"></i>';
-    if (s.includes('react')) return '<i data-lucide="atom"></i>';
-    if (s.includes('redux')) return '<i data-lucide="refresh-cw"></i>';
-    if (s.includes('tailwind')) return '<i data-lucide="wind"></i>';
-    if (s.includes('bootstrap')) return '<i data-lucide="layout"></i>';
-    if (s.includes('vue')) return '<i data-lucide="code"></i>';
-    if (s.includes('mysql') || s.includes('sql')) return '<i data-lucide="database"></i>';
-    if (s.includes('python')) return '<i data-lucide="terminal"></i>';
-    if (s.includes('express') || s.includes('flask')) return '<i data-lucide="server"></i>';
-    if (s.includes('api')) return '<i data-lucide="cpu"></i>';
-    return '<i data-lucide="wrench"></i>';
-  }
-
-  setupSearch() {
-    const searchInput = this.querySelector('#skills-search');
-    const skillsContainer = this.querySelector('#skills-container');
-    
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      const cards = skillsContainer.querySelectorAll('.skill-badge-card');
-      
-      cards.forEach(card => {
-        const name = card.getAttribute('data-skill-name').toLowerCase();
-        if (name.includes(query)) {
-          card.style.display = 'flex';
-          card.classList.remove('hidden-item');
-        } else {
-          card.style.display = 'none';
-          card.classList.add('hidden-item');
-        }
-      });
-    });
   }
 }
 
