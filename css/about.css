@@ -158,8 +158,22 @@
   box-shadow: var(--shadow-lg), 0 0 25px rgba(0, 242, 254, 0.05);
 }
 
+.about-chat-card.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+}
+
 .chat-panel {
   height: 100%;
+}
+
+/* Locks background scroll while the chat is expanded to fullscreen. */
+body.chat-fullscreen-lock {
+  overflow: hidden;
 }
 
 .chat-header {
@@ -172,47 +186,49 @@
   height: 45px;
 }
 
-.chat-tabs {
-  display: flex;
-  height: 100%;
-  align-items: flex-end;
-}
-
-.chat-tab {
+.chat-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
-  padding: 0 16px;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-bottom: none;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  color: var(--accent-primary);
-  position: relative;
-  top: 1px;
-  z-index: 2;
+  color: var(--text-muted);
 }
 
-.tab-icon {
+.chat-title-icon {
   width: 14px;
   height: 14px;
   stroke: var(--accent-primary);
 }
 
-.tab-close {
-  font-size: 0.8rem;
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.chat-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
   color: var(--text-muted);
   cursor: pointer;
-  margin-left: 4px;
   transition: color var(--transition-fast);
 }
 
-.tab-close:hover {
-  color: #ff5f56;
+.chat-fullscreen-btn:hover,
+.chat-fullscreen-btn:focus-visible {
+  color: var(--accent-primary);
+}
+
+.chat-fullscreen-btn .fullscreen-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .chat-status {

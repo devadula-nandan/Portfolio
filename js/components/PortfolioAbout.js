@@ -49,6 +49,33 @@ export class PortfolioAbout extends HTMLElement {
 
     checkChatHealth();
 
+    const chatCard = this.querySelector('.about-chat-card');
+    const fullscreenBtn = this.querySelector('#chat-fullscreen-btn');
+
+    if (chatCard && fullscreenBtn) {
+      const setFullscreen = (isFullscreen) => {
+        chatCard.classList.toggle('is-fullscreen', isFullscreen);
+        document.body.classList.toggle('chat-fullscreen-lock', isFullscreen);
+        fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
+        fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen chat' : 'Expand chat to fullscreen');
+        fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? 'minimize-2' : 'maximize-2'}" class="fullscreen-icon"></i>`;
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+        messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'auto' });
+      };
+
+      fullscreenBtn.addEventListener('click', () => {
+        setFullscreen(!chatCard.classList.contains('is-fullscreen'));
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && chatCard.classList.contains('is-fullscreen')) {
+          setFullscreen(false);
+        }
+      });
+    }
+
     const getBotResponse = (query) => {
       const q = query.toLowerCase().trim();
       const match = chatResponses.find(r => r.keywords.some(k => q.includes(k)));
@@ -235,16 +262,18 @@ export class PortfolioAbout extends HTMLElement {
               <!-- Interactive Chat Assistant -->
               <div class="about-chat-card card">
                 <div class="chat-header">
-                  <div class="chat-tabs">
-                    <div class="chat-tab active">
-                      <i data-lucide="file-code-2" class="tab-icon"></i>
-                      <span>assistant.ts</span>
-                      <span class="tab-close">×</span>
-                    </div>
+                  <div class="chat-title">
+                    <i data-lucide="file-code-2" class="chat-title-icon"></i>
+                    <span>assistant.ts</span>
                   </div>
-                  <div class="chat-status">
-                    <span class="chat-status-dot" id="chat-status-dot"></span>
-                    <span id="chat-status-text">CONNECTING...</span>
+                  <div class="chat-header-actions">
+                    <div class="chat-status">
+                      <span class="chat-status-dot" id="chat-status-dot"></span>
+                      <span id="chat-status-text">CONNECTING...</span>
+                    </div>
+                    <button type="button" class="chat-fullscreen-btn" id="chat-fullscreen-btn" aria-label="Expand chat to fullscreen" aria-pressed="false">
+                      <i data-lucide="maximize-2" class="fullscreen-icon"></i>
+                    </button>
                   </div>
                 </div>
                 
