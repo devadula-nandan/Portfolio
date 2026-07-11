@@ -430,7 +430,9 @@ body.chat-fullscreen-lock {
   border: none;
   outline: none;
   color: var(--text-color);
-  font-size: 0.88rem;
+  /* 16px is the minimum that keeps mobile Safari/Chrome from
+     auto-zooming the page when this field is focused. */
+  font-size: 1rem;
   padding: 8px 0;
 }
 
