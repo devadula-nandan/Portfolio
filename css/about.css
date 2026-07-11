@@ -230,7 +230,8 @@ body.chat-fullscreen-lock {
   gap: 16px;
 }
 
-.chat-fullscreen-btn {
+.chat-fullscreen-btn,
+.chat-reset-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -245,11 +246,14 @@ body.chat-fullscreen-lock {
 }
 
 .chat-fullscreen-btn:hover,
-.chat-fullscreen-btn:focus-visible {
+.chat-fullscreen-btn:focus-visible,
+.chat-reset-btn:hover,
+.chat-reset-btn:focus-visible {
   color: var(--accent-primary);
 }
 
-.chat-fullscreen-btn .fullscreen-icon {
+.chat-fullscreen-btn .fullscreen-icon,
+.chat-reset-btn .reset-icon {
   width: 16px;
   height: 16px;
 }
@@ -390,43 +394,12 @@ body.chat-fullscreen-lock {
   height: 12px;
 }
 
-/* Quick-questions Chips — hidden until the suggestions toggle reveals them */
+/* Quick-questions Chips — appended inline after the greeting, once */
 .chat-chips {
-  display: none;
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 2px;
-}
-
-.chat-chips.is-visible {
-  display: flex;
-}
-
-.chat-suggestions-toggle {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  gap: 6px;
-  padding: 6px 12px;
-  margin-bottom: 2px;
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text-muted);
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color var(--transition-fast), background var(--transition-fast);
-}
-
-.chat-suggestions-toggle:hover,
-.chat-suggestions-toggle[aria-expanded="true"] {
-  color: var(--accent-primary);
-  background: var(--accent-glow);
-}
-
-.chat-suggestions-toggle .suggestions-icon {
-  width: 14px;
-  height: 14px;
 }
 
 .chat-chip {

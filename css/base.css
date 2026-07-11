@@ -275,7 +275,6 @@ section {
 .hero-image-wrapper,
 .nav-link.active,
 .chat-input-wrapper,
-.chat-suggestions-toggle,
 .timeline-dot {
   position: relative;
   border: none !important;
@@ -322,7 +321,6 @@ section {
 .hero-image-wrapper::before,
 .nav-link.active::before,
 .chat-input-wrapper::before,
-.chat-suggestions-toggle::before,
 .timeline-dot::before {
   content: '';
   position: absolute;
@@ -357,7 +355,6 @@ section {
 .hero-image-wrapper::after,
 .nav-link.active::after,
 .chat-input-wrapper::after,
-.chat-suggestions-toggle::after,
 .timeline-dot::after {
   content: '';
   position: absolute;
@@ -392,7 +389,6 @@ section {
 .hero-image-wrapper:hover::before,
 .nav-link.active:hover::before,
 .chat-input-wrapper:focus-within::before,
-.chat-suggestions-toggle:hover::before,
 .timeline-dot:hover::before {
   background-image:
     linear-gradient(90deg, transparent, var(--blueprint-border-color-hover) var(--extend-left, 20px), var(--blueprint-border-color-hover) calc(100% - var(--extend-right, 20px)), transparent),
@@ -410,7 +406,6 @@ section {
 .hero-image-wrapper:hover::after,
 .nav-link.active:hover::after,
 .chat-input-wrapper:focus-within::after,
-.chat-suggestions-toggle:hover::after,
 .timeline-dot:hover::after {
   background-image:
     linear-gradient(180deg, transparent, var(--blueprint-border-color-hover) var(--extend-top, 20px), var(--blueprint-border-color-hover) calc(100% - var(--extend-bottom, 20px)), transparent),

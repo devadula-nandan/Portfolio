@@ -17,9 +17,6 @@ export class PortfolioAbout extends HTMLElement {
     const messagesContainer = this.querySelector('#chat-messages-container');
     const inputForm = this.querySelector('#chat-input-form');
     const userInput = this.querySelector('#chat-user-input');
-    const chips = this.querySelectorAll('.chat-chip');
-    const chatChips = this.querySelector('#chat-chips');
-    const suggestionsToggle = this.querySelector('#chat-suggestions-toggle');
     const statusDot = this.querySelector('#chat-status-dot');
     const statusText = this.querySelector('#chat-status-text');
 
@@ -84,7 +81,7 @@ export class PortfolioAbout extends HTMLElement {
       return match ? match.reply(user) : chatFallbackResponse;
     };
 
-    const addMessage = (text, sender, shouldType = false) => {
+    const addMessage = (text, sender, shouldType = false, onComplete) => {
       const msgDiv = document.createElement('div');
       msgDiv.classList.add('chat-message', sender);
       
@@ -104,6 +101,7 @@ export class PortfolioAbout extends HTMLElement {
             if (window.lucide) {
               window.lucide.createIcons();
             }
+            if (onComplete) onComplete();
             return;
           }
           
@@ -134,6 +132,7 @@ export class PortfolioAbout extends HTMLElement {
           top: messagesContainer.scrollHeight,
           behavior: 'smooth'
         });
+        if (onComplete) onComplete();
       }
     };
 
@@ -199,29 +198,53 @@ export class PortfolioAbout extends HTMLElement {
       handleUserSend(text);
     });
 
-    // Suggestions toggle — chips stay hidden until asked for
-    if (suggestionsToggle && chatChips) {
-      suggestionsToggle.addEventListener('click', () => {
-        const isVisible = chatChips.classList.toggle('is-visible');
-        suggestionsToggle.setAttribute('aria-expanded', String(isVisible));
+    // Quick-reply chips — shown once, inline, right after the greeting
+    // finishes typing, and removed as soon as one is picked.
+    const QUICK_QUESTIONS = [
+      { question: 'Tell me about yourself', label: 'Tell me about yourself' },
+      { question: 'What is your tech stack?', label: 'Tech Stack' },
+      { question: 'What do you do at IBM?', label: 'IBM Carbon Work' },
+      { question: 'How can I contact you?', label: 'Get in Touch' },
+    ];
+
+    const showSuggestionChips = () => {
+      const chipsWrap = document.createElement('div');
+      chipsWrap.classList.add('chat-chips');
+
+      QUICK_QUESTIONS.forEach(({ question, label }) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.classList.add('chat-chip');
+        chip.textContent = label;
+        chip.addEventListener('click', () => {
+          chipsWrap.remove();
+          handleUserSend(question);
+        });
+        chipsWrap.appendChild(chip);
+      });
+
+      messagesContainer.appendChild(chipsWrap);
+      messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+    };
+
+    const playGreeting = () => {
+      const typingDiv = showTypingIndicator();
+      setTimeout(() => {
+        typingDiv.remove();
+        addMessage(chatGreeting, 'bot', true, showSuggestionChips);
+      }, 800);
+    };
+
+    // Reset button — clears the conversation and replays the greeting
+    const resetBtn = this.querySelector('#chat-reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        messagesContainer.innerHTML = '';
+        playGreeting();
       });
     }
 
-    // Chip click listeners
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const question = chip.getAttribute('data-question');
-        if (question) {
-          handleUserSend(question);
-          if (chatChips && suggestionsToggle) {
-            chatChips.classList.remove('is-visible');
-            suggestionsToggle.setAttribute('aria-expanded', 'false');
-          }
-        }
-      });
-    });
-
-    // IntersectionObserver to trigger initial message typing when scrolled into view
+    // IntersectionObserver to trigger the initial greeting when scrolled into view
     let greetingRun = false;
 
     const scrollObserver = new IntersectionObserver((entries) => {
@@ -229,12 +252,7 @@ export class PortfolioAbout extends HTMLElement {
         if (entry.isIntersecting && !greetingRun) {
           greetingRun = true;
           scrollObserver.unobserve(entry.target);
-
-          const typingDiv = showTypingIndicator();
-          setTimeout(() => {
-            typingDiv.remove();
-            addMessage(chatGreeting, 'bot', true);
-          }, 800);
+          playGreeting();
         }
       });
     }, {
@@ -285,32 +303,23 @@ export class PortfolioAbout extends HTMLElement {
                       <span class="chat-status-dot" id="chat-status-dot"></span>
                       <span id="chat-status-text">CONNECTING...</span>
                     </div>
+                    <button type="button" class="chat-reset-btn" id="chat-reset-btn" aria-label="Reset conversation">
+                      <i data-lucide="rotate-ccw" class="reset-icon"></i>
+                    </button>
                     <button type="button" class="chat-fullscreen-btn" id="chat-fullscreen-btn" aria-label="Expand chat to fullscreen" aria-pressed="false">
                       <i data-lucide="maximize-2" class="fullscreen-icon"></i>
                     </button>
                   </div>
                 </div>
-                
+
                 <div class="chat-body">
                   <div class="chat-messages" id="chat-messages-container" aria-live="polite" aria-atomic="false">
-                    <!-- Initial message typed dynamically on scroll observer -->
-                  </div>
-                  
-                  <button type="button" class="chat-suggestions-toggle" id="chat-suggestions-toggle" aria-expanded="false" aria-controls="chat-chips">
-                    <i data-lucide="lightbulb" class="suggestions-icon"></i>
-                    <span>Suggestions</span>
-                  </button>
-
-                  <div class="chat-chips" id="chat-chips">
-                    <button class="chat-chip" data-question="Tell me about yourself">Tell me about yourself</button>
-                    <button class="chat-chip" data-question="What is your tech stack?">Tech Stack</button>
-                    <button class="chat-chip" data-question="What do you do at IBM?">IBM Carbon Work</button>
-                    <button class="chat-chip" data-question="How can I contact you?">Get in Touch</button>
+                    <!-- Greeting + suggestion chips added dynamically on scroll observer -->
                   </div>
 
                   <form class="chat-input-wrapper" id="chat-input-form">
                     <span class="chat-prompt-prefix font-mono">$</span>
-                    <input type="text" id="chat-user-input" class="chat-input" placeholder="Type a message or click Suggestions..." required autocomplete="off" />
+                    <input type="text" id="chat-user-input" class="chat-input" placeholder="Type a message..." required autocomplete="off" />
                     <button type="submit" class="chat-send-btn" aria-label="Send message">
                       <i data-lucide="send" class="send-icon-img"></i>
                     </button>
