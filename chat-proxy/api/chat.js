@@ -5,23 +5,15 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 
 const MAX_MESSAGE_LENGTH = 500;
 
-// This small model has near-total probability mass on one generic joke
-// ("dark mode... light attracts bugs") — raising temperature alone doesn't
-// dislodge it. Force variety ourselves by handing it a random topic to
-// build the joke around whenever the message looks like a joke request.
-const JOKE_REQUEST_PATTERN = /\bjoke|funny|laugh|humor|pun\b/i;
-const JOKE_TOPICS = [
-  'CSS specificity wars', 'JavaScript type coercion', 'npm install taking forever',
-  'git merge conflicts', 'browser compatibility quirks', 'naming variables',
-  'semicolons', 'React re-renders', 'centering a div', 'accessibility audits',
-  'copy-pasting from Stack Overflow', 'code review comments', 'Monday morning deploys',
-  'JSON parsing errors', 'infinite loops', 'CSS !important',
-];
-
+// This small model has near-total probability mass on a handful of stock
+// answers for open-ended asks (e.g. always the same joke) — raising
+// temperature alone doesn't dislodge it, likely because an identical prompt
+// also risks hitting Gemini's own response caching. Appending a random,
+// content-neutral token changes the input each time (busting any cache) and
+// asks for variety without steering toward any particular topic ourselves.
 function buildUserContent(message) {
-  if (!JOKE_REQUEST_PATTERN.test(message)) return message;
-  const topic = JOKE_TOPICS[Math.floor(Math.random() * JOKE_TOPICS.length)];
-  return `${message}\n\n(Make up a brand new joke specifically about "${topic}" — don't default to a generic dark-mode/bugs joke.)`;
+  const nonce = Math.random().toString(36).slice(2, 8);
+  return `${message}\n\n[vary your phrasing and specific details from previous answers — ${nonce}]`;
 }
 
 const SYSTEM_PROMPT = `You are the virtual assistant embedded in Nandan Devadula's portfolio site. Answer questions about him in first person, as if you were speaking on his behalf, in a friendly and concise way (aim for under 60 words unless the question needs more).

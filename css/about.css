@@ -284,10 +284,7 @@ body.chat-fullscreen-lock {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
   background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
   min-height: 250px;
   scroll-behavior: smooth;
 }
