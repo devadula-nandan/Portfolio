@@ -4,6 +4,13 @@ export class PortfolioHero extends HTMLElement {
   connectedCallback() {
     this.render();
     this.startTypingEffect();
+    this.startAmoebaMorph();
+  }
+
+  disconnectedCallback() {
+    if (this.amoebaInterval) {
+      clearInterval(this.amoebaInterval);
+    }
   }
 
   render() {
@@ -16,37 +23,43 @@ export class PortfolioHero extends HTMLElement {
               <span class="pulse-dot"></span>
               <span class="hero-badge-text">${user.titles?.[0] || 'Frontend Developer'}</span>
             </div>
+            
             <h1 class="hero-title">
               Hi, I'm <span class="highlight-text">${user.firstName} ${user.lastName}</span>
             </h1>
+            
             <h2 class="hero-subtitle">
               A <span id="typing-text"></span><span class="typing-cursor"></span>
             </h2>
+            
             <p class="hero-description">
               ${user.description}
             </p>
+            
             <div class="hero-ctas">
               <a href="#contact" class="btn btn-primary">
                 Get In Touch
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <i data-lucide="arrow-right"></i>
               </a>
               <a href="${user.cv}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-                View Resume (CV)
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                View Resume
+                <i data-lucide="download"></i>
               </a>
             </div>
+            
             <div class="hero-socials">
               <a href="${user.social.github}" target="_blank" rel="noopener noreferrer" class="btn-icon" aria-label="GitHub">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <i data-lucide="github"></i>
               </a>
               <a href="${user.social.linkedin}" target="_blank" rel="noopener noreferrer" class="btn-icon" aria-label="LinkedIn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                <i data-lucide="linkedin"></i>
               </a>
               <a href="${user.social.instagram}" target="_blank" rel="noopener noreferrer" class="btn-icon" aria-label="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <i data-lucide="instagram"></i>
               </a>
             </div>
           </div>
+          
           <div class="hero-image-container animate-fade-in">
             <div class="hero-image-wrapper">
               <img src="${user.avatar}" alt="Portrait of ${user.firstName} ${user.lastName}" class="hero-profile-img" width="320" height="320" fetchpriority="high" />
@@ -61,8 +74,8 @@ export class PortfolioHero extends HTMLElement {
     const user = resumeData.user;
     const titles = user.titles || ["Frontend Developer", "Web Components Engineer", "Carbon Design System Contributor"];
     const typingSpan = this.querySelector('#typing-text');
+    if (!typingSpan) return;
 
-    // Respect reduced-motion preference: show a static title instead
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       typingSpan.textContent = titles[0];
       return;
@@ -73,7 +86,7 @@ export class PortfolioHero extends HTMLElement {
     let isDeleting = false;
     let typingSpeed = 100;
 
-    function type() {
+    const type = () => {
       const currentTitle = titles[titleIndex];
 
       if (isDeleting) {
@@ -88,17 +101,49 @@ export class PortfolioHero extends HTMLElement {
 
       if (!isDeleting && charIndex === currentTitle.length) {
         isDeleting = true;
-        typingSpeed = 1800; // Pause at end
+        typingSpeed = 2000;
       } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         titleIndex = (titleIndex + 1) % titles.length;
-        typingSpeed = 500; // Pause before next
+        typingSpeed = 500;
       }
 
       setTimeout(type, typingSpeed);
-    }
+    };
 
-    setTimeout(type, 1000);
+    setTimeout(type, 800);
+  }
+
+  startAmoebaMorph() {
+    const wrapper = this.querySelector('.hero-image-wrapper');
+    const img = this.querySelector('.hero-profile-img');
+    if (!wrapper || !img) return;
+
+    const getRandomRadius = () => {
+      // Morph adjacent corners to sum to exactly 100%, removing straight lines.
+      const r = () => Math.floor(Math.random() * 25) + 38; // 38% to 63%
+      const tl_h = r();
+      const tr_h = 100 - tl_h;
+      const bl_h = r();
+      const br_h = 100 - bl_h;
+
+      const tl_v = r();
+      const bl_v = 100 - tl_v;
+      const tr_v = r();
+      const br_v = 100 - tr_v;
+
+      return `${tl_h}% ${tr_h}% ${br_h}% ${bl_h}% / ${tl_v}% ${tr_v}% ${br_v}% ${bl_v}%`;
+    };
+
+    const morph = () => {
+      const radius = getRandomRadius();
+      wrapper.style.borderRadius = radius;
+      img.style.borderRadius = radius;
+    };
+
+    // Set initial custom shape and start interval
+    morph();
+    this.amoebaInterval = setInterval(morph, 2200);
   }
 }
 

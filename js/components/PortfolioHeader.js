@@ -1,3 +1,5 @@
+import { resumeData } from '../data.js';
+
 export class PortfolioHeader extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -6,11 +8,15 @@ export class PortfolioHeader extends HTMLElement {
   }
 
   render() {
+    const user = resumeData.user;
+    const displayName = user.firstName;
+    
     this.innerHTML = `
       <header class="portfolio-header">
         <div class="container header-container">
           <a href="#home" class="logo" aria-label="Back to top">
-            <span class="logo-text">Nandan.D</span>
+            <mc-avatar size="32"></mc-avatar>
+            <span class="logo-text">${displayName}</span>
           </a>
           
           <nav class="nav-menu" id="nav-menu">
@@ -56,7 +62,6 @@ export class PortfolioHeader extends HTMLElement {
   }
 
   initTheme() {
-    // Saved preference wins; otherwise follow the OS color scheme
     const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
     const savedTheme = localStorage.getItem('portfolio-theme') || systemTheme;
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -65,11 +70,12 @@ export class PortfolioHeader extends HTMLElement {
 
   updateThemeUI(theme) {
     const toggleBtn = this.querySelector('#theme-toggle');
+    if (!toggleBtn) return;
     toggleBtn.classList.toggle('light-active', theme === 'light');
     toggleBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (themeColorMeta) {
-      themeColorMeta.setAttribute('content', theme === 'light' ? '#f8fafc' : '#0a0e17');
+      themeColorMeta.setAttribute('content', theme === 'light' ? '#f8fafc' : '#0b0f19');
     }
   }
 
@@ -79,59 +85,59 @@ export class PortfolioHeader extends HTMLElement {
     const navMenu = this.querySelector('#nav-menu');
     const navLinks = this.querySelectorAll('.nav-link');
 
-    // Theme toggle
-    themeBtn.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('portfolio-theme', newTheme);
-      this.updateThemeUI(newTheme);
-      // Notify components that render theme-dependent assets
-      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
-    });
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('portfolio-theme', newTheme);
+        this.updateThemeUI(newTheme);
+        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
+      });
+    }
 
     const closeMenu = () => {
-      mobileToggle.classList.remove('active');
-      navMenu.classList.remove('active');
-      document.body.classList.remove('no-scroll');
-      mobileToggle.setAttribute('aria-expanded', 'false');
+      if (mobileToggle && navMenu) {
+        mobileToggle.classList.remove('active');
+        navMenu.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      }
     };
 
-    // Mobile menu toggle
-    mobileToggle.addEventListener('click', (e) => {
-      const isOpen = navMenu.classList.toggle('active');
-      mobileToggle.classList.toggle('active', isOpen);
-      document.body.classList.toggle('no-scroll', isOpen);
-      mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      e.stopPropagation(); // Avoid immediately triggering click-outside
-    });
+    if (mobileToggle && navMenu) {
+      mobileToggle.addEventListener('click', (e) => {
+        const isOpen = navMenu.classList.toggle('active');
+        mobileToggle.classList.toggle('active', isOpen);
+        document.body.classList.toggle('no-scroll', isOpen);
+        mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        e.stopPropagation();
+      });
+    }
 
-    // Close menu when a link is clicked
     navLinks.forEach(link => {
       link.addEventListener('click', closeMenu);
     });
 
-    // Close menu on click outside the header menu
     document.addEventListener('click', (e) => {
-      if (navMenu.classList.contains('active')) {
-        if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+      if (navMenu && navMenu.classList.contains('active')) {
+        if (!navMenu.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target)) {
           closeMenu();
         }
       }
     });
 
-    // Keyboard navigation handlers (Escape to close, Tab to trap focus)
     document.addEventListener('keydown', (e) => {
-      if (!navMenu.classList.contains('active')) return;
+      if (!navMenu || !navMenu.classList.contains('active')) return;
 
       if (e.key === 'Escape') {
         closeMenu();
-        mobileToggle.focus();
+        if (mobileToggle) mobileToggle.focus();
         return;
       }
 
       if (e.key === 'Tab') {
-        const focusables = [mobileToggle, themeBtn, ...Array.from(navLinks)];
+        const focusables = [mobileToggle, themeBtn, ...Array.from(navLinks)].filter(Boolean);
         const firstEl = focusables[0];
         const lastEl = focusables[focusables.length - 1];
 
@@ -149,13 +155,10 @@ export class PortfolioHeader extends HTMLElement {
       }
     });
 
-    // Add border scroll effect
     window.addEventListener('scroll', () => {
       const header = this.querySelector('.portfolio-header');
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
+      if (header) {
+        header.classList.toggle('scrolled', window.scrollY > 50);
       }
     });
   }

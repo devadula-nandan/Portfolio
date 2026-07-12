@@ -19,6 +19,48 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   // Normalize URL path to prevent path traversal vulnerability
   let safePath = req.url.split('?')[0];
+
+  // Intercept API routes and proxy to the deployed Vercel instance to bypass local browser CORS policy
+  if (safePath === '/api/health' && req.method === 'GET') {
+    fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/health')
+      .then(proxyRes => proxyRes.json())
+      .then(data => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+      })
+      .catch(err => {
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
+      });
+    return;
+  }
+
+  if (safePath === '/api/chat' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body
+      })
+        .then(proxyRes => {
+          return proxyRes.json().then(data => ({ status: proxyRes.status, data }));
+        })
+        .then(({ status, data }) => {
+          res.writeHead(status, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(data));
+        })
+        .catch(err => {
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
+        });
+    });
+    return;
+  }
+
   if (safePath === '/') {
     safePath = '/index.html';
   }

@@ -1,56 +1,17 @@
-import { getPortfolioData } from '../api.js';
+import { reposData } from '../data.js';
 
 export class PortfolioProjects extends HTMLElement {
   constructor() {
     super();
-    this.projects = [];
+    this.projects = reposData;
     this.activeFilter = 'all';
     this.currentPage = 1;
     this.itemsPerPage = 6;
   }
 
-  async connectedCallback() {
-    this.renderLoading();
-    try {
-      const data = await getPortfolioData();
-      this.projects = data.projects;
-      this.render();
-      this.setupFilters();
-    } catch (error) {
-      console.error('Failed to load projects:', error);
-      this.innerHTML = `<p class="error-text">Failed to load projects. Please try refreshing.</p>`;
-    }
-  }
-
-  renderLoading() {
-    this.innerHTML = `
-      <section class="projects-section" id="projects">
-        <div class="container">
-          <div class="section-header">
-            <h2 class="section-title">Selected Projects</h2>
-            <p class="section-subtitle">A collection of open-source libraries, web components, and applications I've developed</p>
-          </div>
-          
-          <div class="project-filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="frameworks">React & Vue</button>
-            <button class="filter-btn" data-filter="components">Web Components</button>
-            <button class="filter-btn" data-filter="backend">Backend & Scripts</button>
-          </div>
-
-          <div class="projects-grid">
-            ${Array(6).fill().map(() => `
-              <div class="skeleton-card card">
-                <div class="skeleton-header"></div>
-                <div class="skeleton-title"></div>
-                <div class="skeleton-description"></div>
-                <div class="skeleton-footer"></div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </section>
-    `;
+  connectedCallback() {
+    this.render();
+    this.setupFilters();
   }
 
   render() {
@@ -62,11 +23,13 @@ export class PortfolioProjects extends HTMLElement {
             <p class="section-subtitle">A collection of open-source libraries, web components, and applications I've developed</p>
           </div>
           
-          <div class="project-filters">
-            <button class="filter-btn ${this.activeFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
-            <button class="filter-btn ${this.activeFilter === 'frameworks' ? 'active' : ''}" data-filter="frameworks">React & Vue</button>
-            <button class="filter-btn ${this.activeFilter === 'components' ? 'active' : ''}" data-filter="components">Web Components</button>
-            <button class="filter-btn ${this.activeFilter === 'backend' ? 'active' : ''}" data-filter="backend">Backend & Scripts</button>
+          <div class="tabs-wrapper">
+            <div class="project-filters">
+              <button class="filter-btn ${this.activeFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>
+              <button class="filter-btn ${this.activeFilter === 'frameworks' ? 'active' : ''}" data-filter="frameworks">React &amp; Vue</button>
+              <button class="filter-btn ${this.activeFilter === 'components' ? 'active' : ''}" data-filter="components">Web Components</button>
+              <button class="filter-btn ${this.activeFilter === 'backend' ? 'active' : ''}" data-filter="backend">Backend &amp; Scripts</button>
+            </div>
           </div>
 
           <div class="projects-grid" id="projects-grid">
@@ -112,7 +75,7 @@ export class PortfolioProjects extends HTMLElement {
       const liveLinkBtn = p.homepage
         ? `<a href="${p.homepage}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm-card">
              Live Demo
-             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+             <i data-lucide="external-link"></i>
            </a>`
         : '';
 
@@ -142,7 +105,7 @@ export class PortfolioProjects extends HTMLElement {
             ${liveLinkBtn}
             <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm-card">
               Source Code
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              <i data-lucide="github"></i>
             </a>
           </div>
         </div>
@@ -159,7 +122,7 @@ export class PortfolioProjects extends HTMLElement {
     const totalItems = filtered.length;
     const totalPages = Math.ceil(totalItems / this.itemsPerPage);
 
-    // Clamp current page to valid range
+    // Clamp current page
     if (this.currentPage > totalPages) {
       this.currentPage = Math.max(1, totalPages);
     }
@@ -173,15 +136,12 @@ export class PortfolioProjects extends HTMLElement {
 
     grid.innerHTML = this.getFilteredProjectsHTML(paginatedItems);
     
-    // Render pagination controls only if total pages > 1
     if (totalPages > 1) {
       paginationContainer.style.display = 'flex';
       
       let paginationHTML = `
-        <button class="btn btn-secondary btn-pagination" id="prev-page-btn" ${this.currentPage === 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"' : ''} aria-label="Previous Page">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
+        <button class="btn btn-secondary btn-pagination" id="prev-page-btn" ${this.currentPage === 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''} aria-label="Previous Page">
+          <i data-lucide="chevron-left"></i>
         </button>
       `;
 
@@ -194,18 +154,14 @@ export class PortfolioProjects extends HTMLElement {
       }
 
       paginationHTML += `
-        <button class="btn btn-secondary btn-pagination" id="next-page-btn" ${this.currentPage === totalPages ? 'disabled style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"' : ''} aria-label="Next Page">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+        <button class="btn btn-secondary btn-pagination" id="next-page-btn" ${this.currentPage === totalPages ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''} aria-label="Next Page">
+          <i data-lucide="chevron-right"></i>
         </button>
       `;
 
       paginationContainer.innerHTML = paginationHTML;
 
-      // Add listeners to page numbers
-      const pageBtns = this.querySelectorAll('.btn-pagination-num');
-      pageBtns.forEach(btn => {
+      this.querySelectorAll('.btn-pagination-num').forEach(btn => {
         btn.addEventListener('click', () => {
           this.currentPage = parseInt(btn.getAttribute('data-page'));
           this.updateProjectsDisplay();
@@ -213,7 +169,6 @@ export class PortfolioProjects extends HTMLElement {
         });
       });
 
-      // Add listener to prev button
       const prevBtn = this.querySelector('#prev-page-btn');
       if (prevBtn && this.currentPage > 1) {
         prevBtn.addEventListener('click', () => {
@@ -223,7 +178,6 @@ export class PortfolioProjects extends HTMLElement {
         });
       }
 
-      // Add listener to next button
       const nextBtn = this.querySelector('#next-page-btn');
       if (nextBtn && this.currentPage < totalPages) {
         nextBtn.addEventListener('click', () => {
@@ -262,8 +216,9 @@ export class PortfolioProjects extends HTMLElement {
   }
 
   setupFilters() {
-    const filters = this.querySelectorAll('.filter-btn');
-    
+    // Scope to the filter bar — pagination numbers also carry .filter-btn
+    // for styling and must not receive the filter handler
+    const filters = this.querySelectorAll('.project-filters .filter-btn');
     filters.forEach(btn => {
       btn.addEventListener('click', () => {
         filters.forEach(b => b.classList.remove('active'));

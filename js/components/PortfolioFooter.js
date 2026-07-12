@@ -11,21 +11,22 @@ export class PortfolioFooter extends HTMLElement {
     this.innerHTML = `
       <footer class="portfolio-footer">
         <div class="container footer-container">
-          <div class="footer-logo">
-            <span class="logo-text">${user.firstName}.${user.lastName.charAt(0)}</span>
+          <div class="footer-text">
+            &copy; ${year} ${user.firstName} ${user.lastName}. All rights reserved.
           </div>
           
-          <p class="footer-copy">
-            &copy; ${year} ${user.firstName} ${user.lastName}. All Rights Reserved.
-          </p>
+          <div class="footer-text">
+            Built using Vanilla Web Components &amp; <span class="highlight-text">data.js</span>
+          </div>
           
-          <p class="footer-credits">
-            Built with <i data-lucide="zap" class="footer-zap"></i> Vanilla Web Components, CSS3 Grid/Flexbox & GitHub API.
-          </p>
-          
-          <a href="#home" class="back-to-top" aria-label="Scroll back to top">
-            <i data-lucide="arrow-up"></i>
-          </a>
+          <div class="footer-socials">
+            <a href="${user.social.github}" target="_blank" rel="noopener noreferrer" class="btn-icon" aria-label="GitHub">
+              <i data-lucide="github"></i>
+            </a>
+            <a href="${user.social.linkedin}" target="_blank" rel="noopener noreferrer" class="btn-icon" aria-label="LinkedIn">
+              <i data-lucide="linkedin"></i>
+            </a>
+          </div>
         </div>
       </footer>
     `;

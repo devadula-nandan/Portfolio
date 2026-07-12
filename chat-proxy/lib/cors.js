@@ -10,7 +10,9 @@ const STATIC_ALLOWED_ORIGINS = new Set([
 const LOCAL_NETWORK_ORIGIN = /^http:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}):\d+$/;
 
 export function isAllowedOrigin(origin) {
-  return STATIC_ALLOWED_ORIGINS.has(origin) || LOCAL_NETWORK_ORIGIN.test(origin);
+  return STATIC_ALLOWED_ORIGINS.has(origin) || 
+         LOCAL_NETWORK_ORIGIN.test(origin) || 
+         /^http:\/\/localhost(:\d+)?$/.test(origin);
 }
 
 export function setCorsHeaders(req, res) {

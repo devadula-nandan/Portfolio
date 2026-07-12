@@ -13,14 +13,14 @@ export class PortfolioContact extends HTMLElement {
         <div class="container">
           <div class="section-header">
             <h2 class="section-title">Get In Touch</h2>
-            <p class="section-subtitle">Have a project idea, question, or want to collaborate? Send a message!</p>
+            <p class="section-subtitle">Have a project idea, a job opportunity, or want to collaborate? Drop a line!</p>
           </div>
           
           <div class="contact-grid">
-            <!-- Left Side: Contact Information Cards -->
+            <!-- Left Side: Contact details -->
             <div class="contact-info">
               <h3 class="contact-info-title">Contact Channels</h3>
-              <p class="contact-info-desc">Feel free to reach out via email or telephone, or connect on my social channels. I'm always open to discussing frontend engineering roles, design systems, or freelance opportunities.</p>
+              <p class="contact-info-desc">Feel free to reach out via email or phone, or connect on social media. I am always open to discussing design systems, frontend roles, or WCAG accessibility opportunities.</p>
               
               <div class="contact-cards-stack">
                 <a href="mailto:${user.contact.email}" class="contact-detail-card card">
@@ -43,20 +43,20 @@ export class PortfolioContact extends HTMLElement {
                   <div class="detail-icon"><i data-lucide="map-pin"></i></div>
                   <div class="detail-content">
                     <span class="detail-label">Work Location</span>
-                    <span class="detail-value">India (Open to Remote)</span>
+                    <span class="detail-value">${user.experience?.[0]?.location || 'India (Open to Remote)'}</span>
                   </div>
                 </div>
               </div>
             </div>
             
-            <!-- Right Side: Validated Contact Form -->
-            <div class="contact-form-wrapper card">
+            <!-- Right Side: Validated Form -->
+            <div class="contact-form-wrapper card animate-fade-in">
               <h3 class="contact-info-title">Send Message</h3>
-              <form id="portfolio-contact-form" novalidate>
+              <form id="portfolio-contact-form" novalidate autocomplete="off">
                 <div class="form-row">
                   <div class="form-group">
                     <label for="form-name" class="form-label">Full Name *</label>
-                    <input type="text" id="form-name" name="name" class="form-input" placeholder="Your name" required />
+                    <input type="text" id="form-name" name="name" class="form-input" placeholder="Your Name" required />
                     <span class="form-error" id="error-name">Please enter your name.</span>
                   </div>
                 </div>
@@ -73,23 +73,22 @@ export class PortfolioContact extends HTMLElement {
                   <div class="form-group">
                     <label for="form-message" class="form-label">Message *</label>
                     <textarea id="form-message" name="message" class="form-input form-textarea" placeholder="How can I help you?" rows="5" required></textarea>
-                    <span class="form-error" id="error-message">Please enter a message.</span>
+                    <span class="form-error" id="error-message">Please enter your message.</span>
                   </div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full">
                   Send Message
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <i data-lucide="send"></i>
                 </button>
-                <p class="form-hint">Submitting opens your email app with the message pre-filled — nothing is stored on this site.</p>
+                <p class="form-hint">Submitting drafts a pre-filled message in your email client. Nothing is saved on this site.</p>
               </form>
 
               <div class="form-success-alert card" id="success-alert" style="display: none;" role="status">
                 <span class="alert-icon"><i data-lucide="sparkles"></i></span>
                 <div class="alert-message">
-                  <h4>Almost there — check your email app!</h4>
-                  <p>Your message has been drafted in your email client. Just hit send.
-                     If nothing opened, email me directly at
+                  <h4>Check your email app!</h4>
+                  <p>A message template has been created in your email client. Just click send. Or email me directly at
                      <a href="mailto:${user.contact.email}" class="alert-mail-link">${user.contact.email}</a>.</p>
                 </div>
               </div>
@@ -153,22 +152,22 @@ export class PortfolioContact extends HTMLElement {
       }
 
       if (isValid) {
-        // Compose the message in the visitor's email client (static site — no backend)
         const name = nameInput.value.trim();
         const email = emailInput.value.trim();
         const message = messageInput.value.trim();
 
         const subject = encodeURIComponent(`Portfolio contact from ${name}`);
         const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+        
         window.location.href = `mailto:${resumeData.user.contact.email}?subject=${subject}&body=${body}`;
 
         form.style.display = 'none';
-        successAlert.style.display = 'flex';
+        if (successAlert) successAlert.style.display = 'flex';
         form.reset();
       }
     });
 
-    // Clear errors on input
+    // Clear validation indicators on keypress
     nameInput.addEventListener('input', () => {
       nameError.style.display = 'none';
       nameInput.classList.remove('invalid');

@@ -5,11 +5,8 @@ import {
   chatGreeting,
 } from "../data.js";
 
-// Serverless proxy (Vercel) that calls Gemini on the assistant's behalf.
-// See chat-proxy/api/chat.js.
-const CHAT_API_URL =
-  "https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat";
-const HEALTH_API_URL = CHAT_API_URL.replace(/\/chat$/, "/health");
+const CHAT_API_URL = "/api/chat";
+const HEALTH_API_URL = "/api/health";
 const CHAT_API_TIMEOUT_MS = 8000;
 const HEALTH_CHECK_TIMEOUT_MS = 4000;
 
@@ -17,248 +14,322 @@ export class PortfolioAbout extends HTMLElement {
   connectedCallback() {
     this.render();
     this.initChatAssistant();
+    this.initChatControls();
+    this.checkProxyHealth();
+  }
+
+  render() {
+    const user = resumeData.user;
+    
+    // Render highlights list
+    const highlightsHTML = user.highlights.map(h => `
+      <div class="highlight-card card">
+        <span class="highlight-label">${h.label}</span>
+        <span class="highlight-sublabel">${h.sublabel}</span>
+      </div>
+    `).join('');
+
+    this.innerHTML = `
+      <section class="about-section" id="about">
+        <div class="container">
+          <div class="about-grid">
+            <!-- Left Side: Profile & Bio Details -->
+            <div class="about-info">
+              <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">A brief overview of my professional focus and experience highlights</p>
+              </div>
+              <p class="about-desc">
+                ${user.description}
+              </p>
+              <div class="about-highlights">
+                ${highlightsHTML}
+              </div>
+            </div>
+
+            <!-- Right Side: Clean Chat Assistant -->
+            <div class="about-chat-card card">
+              <div class="chat-header">
+                <div class="chat-header-user">
+                  <img src="${user.avatar}" alt="${user.firstName}" class="chat-avatar" />
+                  <div class="chat-header-title">
+                    <h4>${user.firstName}'s Assistant</h4>
+                    <div class="chat-status">
+                      <span class="chat-status-dot"></span>
+                      <span id="chat-status-text">Checking...</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-header-actions">
+                  <button type="button" class="chat-icon-btn" id="chat-reset-btn" aria-label="Reset conversation" title="Reset conversation">
+                    <i data-lucide="rotate-ccw" style="width:16px; height:16px;"></i>
+                  </button>
+                  <button type="button" class="chat-icon-btn" id="chat-expand-btn" aria-label="Expand chat to fullscreen" aria-expanded="false" title="Expand">
+                    <i data-lucide="maximize-2" class="chat-icon-expand" style="width:16px; height:16px;"></i>
+                    <i data-lucide="minimize-2" class="chat-icon-collapse" style="width:16px; height:16px;"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="chat-messages" id="chat-messages-container"></div>
+              
+              <div class="chat-input-area">
+                <form class="chat-form" id="chat-input-form">
+                  <div class="chat-input-wrapper">
+                    <input 
+                      type="text" 
+                      id="chat-user-input" 
+                      class="chat-input" 
+                      placeholder="Ask about stack, experience, contact..." 
+                      required 
+                      autocomplete="off"
+                    />
+                    <button type="submit" class="chat-submit-btn" aria-label="Send Message">
+                      <i data-lucide="send"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  async checkProxyHealth() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS);
+    try {
+      const res = await fetch(HEALTH_API_URL, { signal: controller.signal });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        this.setChatStatus("online");
+      } else {
+        this.setChatStatus("local");
+      }
+    } catch (err) {
+      this.setChatStatus("local");
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  setChatStatus(state) {
+    const statusDot = this.querySelector('.chat-status-dot');
+    const statusText = this.querySelector('#chat-status-text');
+    if (!statusDot || !statusText) return;
+
+    if (state === "online") {
+      statusDot.classList.remove('is-local');
+      statusText.textContent = "AGENT_ONLINE";
+    } else {
+      statusDot.classList.add('is-local');
+      statusText.textContent = "LOCAL_MODE";
+    }
+  }
+
+  initChatControls() {
+    const card = this.querySelector('.about-chat-card');
+    const expandBtn = this.querySelector('#chat-expand-btn');
+    const resetBtn = this.querySelector('#chat-reset-btn');
+    const container = this.querySelector('#chat-messages-container');
+    const input = this.querySelector('#chat-user-input');
+    if (!card || !expandBtn || !resetBtn || !container) return;
+
+    const cardRadius = getComputedStyle(card).borderRadius;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DURATION = reduceMotion ? 0 : 450;
+    const TRANSITION = ['top', 'left', 'width', 'height', 'border-radius']
+      .map(p => `${p} ${DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`)
+      .join(', ');
+
+    let placeholder = null;
+    let expanded = false;
+    let animating = false;
+
+    const setGeometry = (rect) => {
+      card.style.top = `${rect.top}px`;
+      card.style.left = `${rect.left}px`;
+      card.style.width = `${rect.width}px`;
+      card.style.height = `${rect.height}px`;
+    };
+
+    const clearInlineStyles = () => {
+      ['position', 'top', 'left', 'width', 'height', 'margin',
+       'zIndex', 'borderRadius', 'transition'].forEach(p => { card.style[p] = ''; });
+    };
+
+    // transitionend can be missed (e.g. tab hidden), so a timeout backstops it
+    const afterTransition = (fn) => {
+      let called = false;
+      const run = () => { if (!called) { called = true; fn(); } };
+      const onEnd = (e) => {
+        if (e.target !== card) return;
+        card.removeEventListener('transitionend', onEnd);
+        run();
+      };
+      card.addEventListener('transitionend', onEnd);
+      setTimeout(run, DURATION + 100);
+    };
+
+    const expand = () => {
+      if (animating || expanded) return;
+      animating = true;
+
+      const rect = card.getBoundingClientRect();
+      placeholder = document.createElement('div');
+      placeholder.style.height = `${rect.height}px`;
+      card.parentNode.insertBefore(placeholder, card);
+
+      // Pin the card at its current viewport rect, then transition to inset 0
+      card.style.transition = 'none';
+      card.style.position = 'fixed';
+      card.style.zIndex = '2000';
+      card.style.margin = '0';
+      setGeometry(rect);
+      card.classList.add('is-fullscreen');
+      void card.offsetWidth;
+
+      card.style.transition = TRANSITION;
+      setGeometry({ top: 0, left: 0, width: window.innerWidth, height: window.innerHeight });
+      card.style.borderRadius = '0px';
+      document.body.classList.add('no-scroll');
+      expandBtn.setAttribute('aria-expanded', 'true');
+      expandBtn.setAttribute('title', 'Exit fullscreen');
+
+      afterTransition(() => {
+        // Hand geometry over to the .is-fullscreen class so resize keeps working
+        clearInlineStyles();
+        expanded = true;
+        animating = false;
+      });
+    };
+
+    const collapse = () => {
+      if (animating || !expanded) return;
+      animating = true;
+
+      const target = placeholder.getBoundingClientRect();
+      card.style.transition = 'none';
+      card.style.position = 'fixed';
+      card.style.zIndex = '2000';
+      card.style.margin = '0';
+      setGeometry(card.getBoundingClientRect());
+      card.style.borderRadius = '0px';
+      card.classList.remove('is-fullscreen');
+      void card.offsetWidth;
+
+      card.style.transition = TRANSITION;
+      setGeometry(target);
+      card.style.borderRadius = cardRadius;
+      document.body.classList.remove('no-scroll');
+      expandBtn.setAttribute('aria-expanded', 'false');
+      expandBtn.setAttribute('title', 'Expand');
+
+      afterTransition(() => {
+        clearInlineStyles();
+        if (placeholder) { placeholder.remove(); placeholder = null; }
+        expanded = false;
+        animating = false;
+      });
+    };
+
+    expandBtn.addEventListener('click', () => (expanded ? collapse() : expand()));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && expanded) collapse();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      container.innerHTML = `
+        <div class="chat-message assistant">
+          <p>${chatGreeting}</p>
+        </div>
+      `;
+      if (input) input.value = '';
+    });
+
+    // Deep link: /?chat=fullscreen#about opens the chat expanded
+    if (new URLSearchParams(window.location.search).get('chat') === 'fullscreen') {
+      requestAnimationFrame(() => expand());
+    }
   }
 
   initChatAssistant() {
-    const messagesContainer = this.querySelector("#chat-messages-container");
-    const inputForm = this.querySelector("#chat-input-form");
-    const userInput = this.querySelector("#chat-user-input");
-    const statusDot = this.querySelector("#chat-status-dot");
-    const statusText = this.querySelector("#chat-status-text");
-
-    if (!messagesContainer || !inputForm || !userInput) return;
+    const container = this.querySelector('#chat-messages-container');
+    const form = this.querySelector('#chat-input-form');
+    const input = this.querySelector('#chat-user-input');
+    if (!container || !form || !input) return;
 
     const user = resumeData.user;
 
-    // Reflects whether replies are actually coming from Gemini ('online') or
-    // the local keyword-matched fallback ('local') — not just decorative.
-    const setChatStatus = (state) => {
-      if (!statusDot || !statusText) return;
-      statusDot.classList.toggle("is-local", state === "local");
-      statusText.textContent =
-        state === "online" ? "AGENT_ONLINE" : "LOCAL_MODE";
+    const appendMessage = (text, sender) => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-message ${sender}`;
+      msgDiv.innerHTML = text;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
     };
 
-    const checkChatHealth = async () => {
-      const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        HEALTH_CHECK_TIMEOUT_MS,
-      );
-      try {
-        const res = await fetch(HEALTH_API_URL, { signal: controller.signal });
-        const data = await res.json();
-        setChatStatus(res.ok && data.ok ? "online" : "local");
-      } catch (err) {
-        setChatStatus("local");
-      } finally {
-        clearTimeout(timeout);
-      }
-    };
+    // Types the reply's plain text with a caret, then swaps in the
+    // formatted HTML (bold, links, icons) once finished
+    const typeMessage = (html) => new Promise((resolve) => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-message assistant is-typing';
+      // Type into an inner <p> so the caret flows inline with the text
+      // (.chat-message is a column flexbox — a caret directly on it wraps to its own row)
+      const p = document.createElement('p');
+      msgDiv.appendChild(p);
+      container.appendChild(msgDiv);
 
-    checkChatHealth();
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      const text = tmp.textContent;
+      const step = Math.max(1, Math.round(text.length / 120)); // ~2s regardless of length
+      let i = 0;
 
-    const chatCard = this.querySelector(".about-chat-card");
-    const fullscreenBtn = this.querySelector("#chat-fullscreen-btn");
-
-    if (chatCard && fullscreenBtn) {
-      // position:fixed can't itself be transitioned, and animating it with
-      // transform: scale() distorts the content (text/buttons stretch
-      // non-uniformly). So instead this runs a FLIP animation over the real
-      // box geometry (top/left/width/height): capture the card's on-screen
-      // rect, flip the layout (add/remove is-fullscreen), pin it back to the
-      // old rect with inline px values, then transition those inline values
-      // to the fullscreen rect. The box actually resizes — content reflows
-      // like a normal resize instead of stretching.
-      const FLIP_DURATION = 320;
-      const FLIP_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-      const FLIP_TRANSITION = ["top", "left", "width", "height", "min-height"]
-        .map((prop) => `${prop} ${FLIP_DURATION}ms ${FLIP_EASING}`)
-        .join(", ");
-      let naturalRect = null; // the card's rect in its normal grid position
-
-      const pinRect = (rect) => {
-        chatCard.style.top = `${rect.top}px`;
-        chatCard.style.left = `${rect.left}px`;
-        chatCard.style.width = `${rect.width}px`;
-        chatCard.style.height = `${rect.height}px`;
-        chatCard.style.minHeight = `${rect.height}px`;
-      };
-
-      const unpin = () => {
-        chatCard.style.transition = "";
-        chatCard.style.top = "";
-        chatCard.style.left = "";
-        chatCard.style.width = "";
-        chatCard.style.height = "";
-        chatCard.style.minHeight = "";
-      };
-
-      const onBoxTransitionEnd = (cleanup) => {
-        chatCard.addEventListener("transitionend", function onEnd(e) {
-          if (e.target !== chatCard || e.propertyName !== "width") return;
-          chatCard.removeEventListener("transitionend", onEnd);
-          cleanup();
-        });
-      };
-
-      // Enter: is-fullscreen is added first (native box becomes the
-      // viewport), then we pin the box back to the old natural rect with
-      // inline px values and transition those away to the fullscreen rect —
-      // growing from the card's real position/size into the fullscreen one.
-      const flipEnter = () => {
-        naturalRect = chatCard.getBoundingClientRect();
-        document.body.classList.add("chat-fullscreen-lock");
-
-        chatCard.style.transition = "none";
-        chatCard.classList.add("is-fullscreen");
-        const fullscreenRect = chatCard.getBoundingClientRect();
-
-        pinRect(naturalRect);
-        chatCard.getBoundingClientRect(); // force reflow before animating away from it
-
-        requestAnimationFrame(() => {
-          chatCard.style.transition = FLIP_TRANSITION;
-          pinRect(fullscreenRect);
-        });
-
-        onBoxTransitionEnd(unpin);
-      };
-
-      // Exit: keep is-fullscreen (fixed, top of stack) applied for the
-      // whole animation and instead animate the box down to "the natural
-      // rect" — only removing the class once the box already matches, so
-      // there's no stacking-context glitch from dropping position:fixed
-      // mid-shrink.
-      const flipExit = () => {
-        const fullscreenRect = chatCard.getBoundingClientRect();
-        const targetRect = naturalRect || fullscreenRect;
-
-        chatCard.style.transition = "none";
-        pinRect(fullscreenRect);
-        chatCard.getBoundingClientRect(); // force reflow before animating
-
-        chatCard.style.transition = FLIP_TRANSITION;
-        requestAnimationFrame(() => {
-          pinRect(targetRect);
-        });
-
-        onBoxTransitionEnd(() => {
-          chatCard.classList.remove("is-fullscreen");
-          document.body.classList.remove("chat-fullscreen-lock");
-          unpin();
-        });
-      };
-
-      const setFullscreen = (isFullscreen) => {
-        fullscreenBtn.setAttribute("aria-pressed", String(isFullscreen));
-        fullscreenBtn.setAttribute(
-          "aria-label",
-          isFullscreen ? "Exit fullscreen chat" : "Expand chat to fullscreen",
-        );
-        fullscreenBtn.innerHTML = `<i data-lucide="${isFullscreen ? "minimize-2" : "maximize-2"}" class="fullscreen-icon"></i>`;
-        if (window.lucide) {
-          window.lucide.createIcons();
+      const iv = setInterval(() => {
+        i += step;
+        p.textContent = text.slice(0, i);
+        container.scrollTop = container.scrollHeight;
+        if (i >= text.length) {
+          clearInterval(iv);
+          msgDiv.classList.remove('is-typing');
+          msgDiv.innerHTML = html;
+          container.scrollTop = container.scrollHeight;
+          resolve();
         }
+      }, 18);
+    });
 
-        if (isFullscreen) {
-          flipEnter();
-        } else {
-          flipExit();
-        }
-
-        messagesContainer.scrollTo({
-          top: messagesContainer.scrollHeight,
-          behavior: "auto",
-        });
-      };
-
-      fullscreenBtn.addEventListener("click", () => {
-        setFullscreen(!chatCard.classList.contains("is-fullscreen"));
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (
-          e.key === "Escape" &&
-          chatCard.classList.contains("is-fullscreen")
-        ) {
-          setFullscreen(false);
-        }
-      });
-    }
-
-    const getBotResponse = (query) => {
-      const q = query.toLowerCase().trim();
-      const match = chatResponses.find((r) =>
-        r.keywords.some((k) => q.includes(k)),
-      );
-      return match ? match.reply(user) : chatFallbackResponse;
-    };
-
-    const addMessage = (text, sender, shouldType = false, onComplete) => {
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("chat-message", sender);
-
-      const bubble = document.createElement("div");
-      bubble.classList.add("msg-bubble");
-      msgDiv.appendChild(bubble);
-      messagesContainer.appendChild(msgDiv);
-
-      if (shouldType) {
-        let currentText = "";
-        let i = 0;
-        let isTag = false;
-
-        const interval = setInterval(() => {
-          if (i >= text.length) {
-            clearInterval(interval);
-            if (window.lucide) {
-              window.lucide.createIcons();
-            }
-            if (onComplete) onComplete();
-            return;
-          }
-
-          const char = text[i];
-          if (char === "<") {
-            isTag = true;
-          }
-
-          currentText += char;
-
-          if (char === ">") {
-            isTag = false;
-          }
-
-          i++;
-
-          if (isTag) return;
-
-          bubble.innerHTML = currentText;
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 12); // Typing speed
-      } else {
-        bubble.innerHTML = text;
-        if (window.lucide) {
-          window.lucide.createIcons();
-        }
-        messagesContainer.scrollTo({
-          top: messagesContainer.scrollHeight,
-          behavior: "smooth",
-        });
-        if (onComplete) onComplete();
-      }
-    };
+    // Type the greeting once the chat card is fully scrolled into view
+    const card = this.querySelector('.about-chat-card');
+    const greetObserver = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      greetObserver.disconnect();
+      if (container.children.length === 0) typeMessage(`<p>${chatGreeting}</p>`);
+    }, { threshold: 0.98 });
+    greetObserver.observe(card);
 
     const showTypingIndicator = () => {
-      const typingDiv = document.createElement("div");
-      typingDiv.classList.add("chat-message", "bot", "typing-indicator-msg");
-      typingDiv.setAttribute("aria-hidden", "true");
-      typingDiv.innerHTML = `<div class="msg-bubble typing-dots">
-        <span></span><span></span><span></span>
-      </div>`;
-      messagesContainer.appendChild(typingDiv);
-      return typingDiv;
+      const indDiv = document.createElement('div');
+      indDiv.className = 'chat-message assistant typing-indicator-msg';
+      indDiv.id = 'typing-indicator';
+      indDiv.innerHTML = `
+        <span style="display:inline-flex; gap:4px; align-items:center;">
+          <span class="typing-dot" style="width:5px; height:5px; background:var(--text-muted); border-radius:50%; animation: blink 1.2s infinite 0.1s;"></span>
+          <span class="typing-dot" style="width:5px; height:5px; background:var(--text-muted); border-radius:50%; animation: blink 1.2s infinite 0.2s;"></span>
+          <span class="typing-dot" style="width:5px; height:5px; background:var(--text-muted); border-radius:50%; animation: blink 1.2s infinite 0.3s;"></span>
+        </span>
+      `;
+      container.appendChild(indDiv);
+      container.scrollTop = container.scrollHeight;
+    };
+
+    const removeTypingIndicator = () => {
+      const ind = this.querySelector('#typing-indicator');
+      if (ind) ind.remove();
     };
 
     const getAiResponse = async (queryText) => {
@@ -266,8 +337,8 @@ export class PortfolioAbout extends HTMLElement {
       const timeout = setTimeout(() => controller.abort(), CHAT_API_TIMEOUT_MS);
       try {
         const res = await fetch(CHAT_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: queryText }),
           signal: controller.signal,
         });
@@ -279,246 +350,45 @@ export class PortfolioAbout extends HTMLElement {
       }
     };
 
-    const triggerBotResponse = async (queryText) => {
-      const typingDiv = showTypingIndicator();
-      messagesContainer.scrollTo({
-        top: messagesContainer.scrollHeight,
-        behavior: "smooth",
-      });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const messageText = input.value.trim();
+      if (!messageText) return;
+
+      // Append user message
+      appendMessage(messageText, 'user');
+      input.value = '';
+
+      showTypingIndicator();
 
       let reply;
       try {
-        reply = await getAiResponse(queryText);
-        setChatStatus("online");
+        reply = await getAiResponse(messageText);
+        this.setChatStatus("online");
       } catch (err) {
-        // Proxy unreachable, rate-limited, or slow — fall back to local answers
-        // so the widget never looks broken.
-        reply = getBotResponse(queryText);
-        setChatStatus("local");
+        console.warn("Proxy query failed, falling back to local chat responses.", err);
+        const query = messageText.toLowerCase();
+        let matchedReply = null;
+
+        for (const response of chatResponses) {
+          const matches = response.keywords.some(keyword => query.includes(keyword));
+          if (matches) {
+            matchedReply = response.reply(user);
+            break;
+          }
+        }
+        reply = matchedReply || chatFallbackResponse;
+        this.setChatStatus("local");
       }
 
-      typingDiv.remove();
-      addMessage(reply, "bot", true);
-    };
+      removeTypingIndicator();
+      await typeMessage(reply);
 
-    const handleUserSend = (text) => {
-      if (!text.trim()) return;
-      addMessage(text, "user");
-      triggerBotResponse(text);
-    };
-
-    // Form submission listener
-    inputForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = userInput.value;
-      userInput.value = "";
-      handleUserSend(text);
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
     });
-
-    // Quick-reply chips — shown once, inline, right after the greeting
-    // finishes typing, and removed as soon as one is picked.
-    const QUICK_QUESTIONS = [
-      { question: "Tell me about yourself", label: "Tell me about yourself" },
-      { question: "What is your tech stack?", label: "Tech Stack" },
-      { question: "What do you do at IBM?", label: "IBM Carbon Work" },
-      { question: "How can I contact you?", label: "Get in Touch" },
-    ];
-
-    const showSuggestionChips = () => {
-      const chipsWrap = document.createElement("div");
-      chipsWrap.classList.add("chat-chips");
-
-      QUICK_QUESTIONS.forEach(({ question, label }) => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.classList.add("chat-chip");
-        chip.textContent = label;
-        chip.addEventListener("click", () => {
-          chipsWrap.remove();
-          handleUserSend(question);
-        });
-        chipsWrap.appendChild(chip);
-      });
-
-      messagesContainer.appendChild(chipsWrap);
-      messagesContainer.scrollTo({
-        top: messagesContainer.scrollHeight,
-        behavior: "smooth",
-      });
-    };
-
-    const playGreeting = () => {
-      const typingDiv = showTypingIndicator();
-      setTimeout(() => {
-        typingDiv.remove();
-        addMessage(chatGreeting, "bot", true, showSuggestionChips);
-      }, 800);
-    };
-
-    // Reset button — clears the conversation and replays the greeting
-    const resetBtn = this.querySelector("#chat-reset-btn");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        messagesContainer.innerHTML = "";
-        playGreeting();
-      });
-    }
-
-    // IntersectionObserver to trigger the initial greeting when scrolled into view
-    let greetingRun = false;
-
-    const scrollObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !greetingRun) {
-            greetingRun = true;
-            scrollObserver.unobserve(entry.target);
-            playGreeting();
-          }
-        });
-      },
-      {
-        root: null,
-        threshold: 0.15, // Trigger when 15% of the section is visible
-      },
-    );
-
-    const aboutSection = this.querySelector("#about");
-    if (aboutSection) {
-      scrollObserver.observe(aboutSection);
-    }
-  }
-
-  render() {
-    const user = resumeData.user;
-    const highlights = user.highlights;
-
-    const yExp = highlights[0]?.label || "5+ Years";
-    const yExpSub = highlights[0]?.sublabel || "Frontend Engineering";
-    const carbonRole = highlights[1]?.label || "IBM Carbon";
-    const carbonSub = highlights[1]?.sublabel || "Open Source Contributor";
-    const repoCount = highlights[2]?.label || "40+";
-    const repoSub = highlights[2]?.sublabel || "GitHub Repositories";
-    const wcagRole = highlights[3]?.label || "WCAG";
-    const wcagSub = highlights[3]?.sublabel || "Accessibility Advocate";
-
-    this.innerHTML = `
-      <section class="about-section" id="about">
-        <div class="container">
-          <div class="section-header">
-            <h2 class="section-title">About Me</h2>
-            <p class="section-subtitle">Bridging pixel-perfect design assets with clean, highly accessible, and modular systems</p>
-          </div>
-          
-          <div class="about-dashboard">
-            <!-- COLUMN 1: Chat Assistant Panel -->
-            <div class="about-panel chat-panel">
-
-              <!-- Interactive Chat Assistant -->
-              <div class="about-chat-card card">
-                <div class="chat-header">
-                  <div class="chat-title">
-                    <i data-lucide="file-code-2" class="chat-title-icon"></i>
-                    <span>assistant.ts</span>
-                  </div>
-                  <div class="chat-header-actions">
-                    <div class="chat-status">
-                      <span class="chat-status-dot" id="chat-status-dot"></span>
-                      <span id="chat-status-text">CONNECTING...</span>
-                    </div>
-                    <button type="button" class="chat-reset-btn" id="chat-reset-btn" aria-label="Reset conversation">
-                      <i data-lucide="rotate-ccw" class="reset-icon"></i>
-                    </button>
-                    <button type="button" class="chat-fullscreen-btn" id="chat-fullscreen-btn" aria-label="Expand chat to fullscreen" aria-pressed="false">
-                      <i data-lucide="maximize-2" class="fullscreen-icon"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="chat-body">
-                  <div class="chat-messages" id="chat-messages-container" aria-live="polite" aria-atomic="false">
-                    <!-- Greeting + suggestion chips added dynamically on scroll observer -->
-                  </div>
-
-                  <form class="chat-input-wrapper" id="chat-input-form">
-                    <span class="chat-prompt-prefix font-mono">$</span>
-                    <input type="text" id="chat-user-input" class="chat-input" placeholder="Type a message..." required autocomplete="off" />
-                    <button type="submit" class="chat-send-btn" aria-label="Send message">
-                      <i data-lucide="send" class="send-icon-img"></i>
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <!-- COLUMN 2: Philosophy & Telemetry Grid -->
-            <div class="about-panel details-panel">
-
-              <div class="pillars-grid">
-                <!-- Pillar 1 -->
-                <div class="pillar-card card">
-                  <div class="pillar-header">
-                    <div class="pillar-icon-box"><i data-lucide="cpu"></i></div>
-                    <h4 class="pillar-title">Component Architecture</h4>
-                  </div>
-                  <p class="pillar-desc">Designing modular Web Components and React libraries using Lit and TypeScript that serve as the single source of truth for design patterns.</p>
-                  <div class="pillar-badge-strip">
-                    <span class="badge">Lit</span>
-                    <span class="badge">TypeScript</span>
-                    <span class="badge">Carbon Labs</span>
-                  </div>
-                </div>
-
-                <!-- Pillar 2 -->
-                <div class="pillar-card card">
-                  <div class="pillar-header">
-                    <div class="pillar-icon-box"><i data-lucide="eye"></i></div>
-                    <h4 class="pillar-title">Inclusive & A11y First</h4>
-                  </div>
-                  <p class="pillar-desc">Building interfaces compliant with WCAG 2.1 standards. Ensuring keyboard support, screen-reader patterns, and automated accessibility testing.</p>
-                  <div class="pillar-badge-strip">
-                    <span class="badge">WCAG 2.1</span>
-                    <span class="badge">WAI-ARIA</span>
-                    <span class="badge">Playwright</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Telemetry Stats Dashboard Grid -->
-              <div class="telemetry-dashboard">
-                <div class="telemetry-grid">
-                  <div class="telemetry-card card">
-                    <div class="telemetry-lines"></div>
-                    <div class="telemetry-meta">METRIC // CHRONO</div>
-                    <div class="telemetry-value">${yExp}</div>
-                    <div class="telemetry-label">${yExpSub}</div>
-                  </div>
-                  <div class="telemetry-card card">
-                    <div class="telemetry-lines"></div>
-                    <div class="telemetry-meta">METRIC // CONTRIB</div>
-                    <div class="telemetry-value">${carbonRole}</div>
-                    <div class="telemetry-label">${carbonSub}</div>
-                  </div>
-                  <div class="telemetry-card card">
-                    <div class="telemetry-lines"></div>
-                    <div class="telemetry-meta">METRIC // CODEBASE</div>
-                    <div class="telemetry-value" id="about-repos-count">${repoCount}</div>
-                    <div class="telemetry-label">${repoSub}</div>
-                  </div>
-                  <div class="telemetry-card card">
-                    <div class="telemetry-lines"></div>
-                    <div class="telemetry-meta">METRIC // AUDIT</div>
-                    <div class="telemetry-value">${wcagRole}</div>
-                    <div class="telemetry-label">${wcagSub}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    `;
   }
 }
 
-customElements.define("portfolio-about", PortfolioAbout);
+customElements.define('portfolio-about', PortfolioAbout);

@@ -30,19 +30,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
 
-  <!-- Stylesheets (order matters: base first, then one file per component) -->
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/header.css" />
-  <link rel="stylesheet" href="css/hero.css" />
-  <link rel="stylesheet" href="css/about.css" />
-  <link rel="stylesheet" href="css/skills.css" />
-  <link rel="stylesheet" href="css/experience.css" />
-  <link rel="stylesheet" href="css/projects.css" />
-  <link rel="stylesheet" href="css/github-stats.css" />
-  <link rel="stylesheet" href="css/contact.css" />
-  <link rel="stylesheet" href="css/footer.css" />
-  <link rel="stylesheet" href="css/widgets-fallback.css" />
-  <link rel="stylesheet" href="css/cursor-effects.css" />
+  <!-- Consolidated Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
 
   <!-- Favicon (inline SVG) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 fill=%22none%22/><path d=%22M35 35 L20 50 L35 65 M65 35 L80 50 L65 65%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/></svg>">
@@ -65,25 +54,7 @@
   </script>
 </head>
 <body>
-  <!-- Scroll Progress Indicator -->
-  <div class="scroll-progress-bar" id="scroll-bar" aria-hidden="true">
-    <div class="scroll-progress-cursor">
-      <div class="scroll-progress-cursor-h"></div>
-      <div class="scroll-progress-cursor-v"></div>
-    </div>
-  </div>
 
-  <!-- Precision CAD Crosshair Cursor -->
-  <div class="precision-cursor" id="precision-cursor" aria-hidden="true">
-    <div class="crosshair-h"></div>
-    <div class="crosshair-v"></div>
-    <div class="crosshair-circle"></div>
-    <div class="crosshair-dot"></div>
-    <div class="crosshair-coords" id="crosshair-coords">X: 0px<br>Y: 0px</div>
-  </div>
-
-  <!-- Windows-style click-drag selection marquee -->
-  <div class="selection-rect" id="selection-rect" aria-hidden="true"></div>
 
   <!-- Fixed Background Canvas -->
   <div class="portfolio-background" aria-hidden="true">

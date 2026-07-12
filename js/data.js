@@ -114,6 +114,26 @@ export const resumeData = {
         "description": "Intermediate education with Mathematics, Physics, and Chemistry specialization under the Andhra Pradesh Board of Secondary Education.",
         "type": "academic"
       }
+    ],
+    "awards": [
+      {
+        "year": "2025",
+        "place": "IBM",
+        "title": "Lorem Ipsum Excellence Award",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      },
+      {
+        "year": "2024",
+        "place": "IBM",
+        "title": "Dolor Sit Amet Recognition",
+        "description": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      },
+      {
+        "year": "2023",
+        "place": "HCL Technologies",
+        "title": "Consectetur Adipiscing Award",
+        "description": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      }
     ]
   }
 };
@@ -288,3 +308,18 @@ export const reposData = [
     "topics": ["automation", "python", "youtube-api", "gameplay-clips"]
   }
 ];
+
+export const statsData = {
+  totalStars: 25,
+  totalForks: 10,
+  totalRepos: 43,
+  followers: 18,
+  languages: {
+    "JavaScript": 45,
+    "TypeScript": 30,
+    "Python": 12,
+    "HTML": 8,
+    "CSS": 5
+  }
+};
+
