@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/chat", "destination": "/chat-proxy/api/chat.js" },
-    { "source": "/api/health", "destination": "/chat-proxy/api/health.js" }
-  ]
-}

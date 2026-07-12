@@ -1,4 +1,4 @@
-import { setCorsHeaders } from '../lib/cors.js';
+const { setCorsHeaders } = require('../lib/cors.js');
 
 const GEMINI_MODEL = 'gemini-flash-lite-latest';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -17,7 +17,7 @@ About Nandan:
 
 You mainly talk about Nandan's professional background, skills, and how to contact him, but don't deflect casual or fun personal questions (favorite color, hobbies, etc.) — answer them naturally and in character, in a way that fits a frontend developer who likes clean design (e.g. his favorite color is the site's own neon cyan, #00f2fe). Only redirect if a question is truly inappropriate or unanswerable.`;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {

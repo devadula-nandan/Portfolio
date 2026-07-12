@@ -1,8 +1,8 @@
 // Cheap reachability/config check for the About chat widget's status
 // indicator — never calls Gemini, so it costs nothing and returns instantly.
-import { isAllowedOrigin } from '../lib/cors.js';
+const { isAllowedOrigin } = require('../lib/cors.js');
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   const origin = req.headers.origin || '';
   if (isAllowedOrigin(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
