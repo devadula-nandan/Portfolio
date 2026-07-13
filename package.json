@@ -2,7 +2,7 @@
   "name": "portfolio",
   "version": "1.0.0",
   "private": true,
-  "description": "Personal portfolio of Nandan Devadula — zero-framework Web Components site",
+  "description": "Personal portfolio of Nandan Devadula — zero-framework single-file site",
   "scripts": {
     "start": "node server.js"
   }

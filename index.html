@@ -1,102 +1,1828 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nandan Devadula | Frontend Developer</title>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nandan Devadula — Frontend Developer</title>
 
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Personal portfolio of Nandan Devadula — Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
-  <meta name="keywords" content="Nandan Devadula, Frontend Developer, React, Web Components, Carbon Design System, IBM, TypeScript, UI Developer" />
-  <meta name="author" content="Nandan Devadula" />
-  <meta name="theme-color" content="#0a0e17" />
-  <link rel="canonical" href="https://nandan-dev.com/" />
+    <meta
+      name="description"
+      content="Personal portfolio of Nandan Devadula — Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI."
+    />
+    <meta name="author" content="Nandan Devadula" />
+    <meta
+      name="theme-color"
+      content="#f4f4f4"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#161616"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="canonical" href="https://nandan-dev.com/" />
 
-  <!-- Open Graph / Social Meta Tags -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Nandan Devadula | Frontend Developer" />
-  <meta property="og:description" content="Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
-  <meta property="og:url" content="https://nandan-dev.com/" />
-  <meta property="og:image" content="https://avatars.githubusercontent.com/u/47176249?s=400" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Nandan Devadula — Frontend Developer" />
+    <meta
+      property="og:description"
+      content="Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI."
+    />
+    <meta property="og:url" content="https://nandan-dev.com/" />
+    <meta
+      property="og:image"
+      content="https://avatars.githubusercontent.com/u/47176249?s=400"
+    />
+    <meta name="twitter:card" content="summary" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Nandan Devadula | Frontend Developer" />
-  <meta name="twitter:description" content="Frontend Developer at IBM specializing in the Carbon Design System, Web Components, TypeScript, and accessible enterprise UI." />
-  <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/47176249?s=400" />
+    <!-- apply saved theme before first paint -->
+    <script>
+      {
+        const t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark")
+          document.documentElement.dataset.theme = t;
+      }
+    </script>
 
-  <!-- Fonts (preconnect + non-blocking discovery instead of CSS @import) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
 
-  <!-- Consolidated Stylesheet -->
-  <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2280%22 height=%2280%22 fill=%22none%22 stroke=%22%230f62fe%22 stroke-width=%228%22/><text x=%2250%22 y=%2268%22 font-family=%22monospace%22 font-size=%2248%22 font-weight=%22bold%22 fill=%22%230f62fe%22 text-anchor=%22middle%22>N</text></svg>"
+    />
 
-  <!-- Favicon (inline SVG) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 fill=%22none%22/><path d=%22M35 35 L20 50 L35 65 M65 35 L80 50 L65 65%22 stroke=%22%2300f2fe%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/></svg>">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Nandan Devadula",
+        "url": "https://nandan-dev.com/",
+        "image": "https://avatars.githubusercontent.com/u/47176249?s=400",
+        "jobTitle": "Frontend Developer",
+        "worksFor": { "@type": "Organization", "name": "IBM" },
+        "sameAs": [
+          "https://github.com/devadula-nandan",
+          "https://www.linkedin.com/in/nandan-devadula"
+        ]
+      }
+    </script>
 
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Nandan Devadula",
-    "url": "https://nandan-dev.com/",
-    "image": "https://avatars.githubusercontent.com/u/47176249?s=400",
-    "jobTitle": "Frontend Developer",
-    "worksFor": { "@type": "Organization", "name": "IBM" },
-    "sameAs": [
-      "https://github.com/devadula-nandan",
-      "https://www.linkedin.com/in/nandan-devadula"
-    ]
-  }
-  </script>
-</head>
-<body>
+    <noscript
+      ><style>
+        .reveal {
+          opacity: 1 !important;
+          translate: none !important;
+        }
+      </style></noscript
+    >
+    <style>
+      /* ---------- tokens (light / dark via color-scheme) ---------- */
+      :root {
+        color-scheme: light dark;
+        --paper: light-dark(#f4f4f4, #161616); /* carbon gray-10 / gray-100 */
+        --surface: light-dark(#ffffff, #1f1f1f);
+        --ink: light-dark(#161616, #f4f4f4);
+        --ink-2: light-dark(#525252, #a8a8a8); /* gray-70 / gray-50 */
+        --border: light-dark(#e0e0e0, #393939); /* gray-20 / gray-80 */
+        --chip: light-dark(#e8e8e8, #2e2e2e);
+        --blue: light-dark(#0f62fe, #4589ff); /* carbon blue-60 / blue-40 */
+        --link: light-dark(#0043ce, #78a9ff); /* 4.5:1 on paper */
+        --redline: light-dark(#da1e28, #fa4d56); /* spec annotations */
+        --grid: light-dark(rgba(15, 98, 254, 0.07), rgba(69, 137, 255, 0.09));
+        --glow: light-dark(rgba(15, 98, 254, 0.05), rgba(69, 137, 255, 0.07));
+        --shadow:
+          0 2px 6px light-dark(rgba(22, 22, 22, 0.07), rgba(0, 0, 0, 0.35)),
+          0 14px 28px -10px
+            light-dark(rgba(22, 22, 22, 0.14), rgba(0, 0, 0, 0.5));
+      }
+      /* explicit choice overrides system; no attribute = auto */
+      :root[data-theme="light"] {
+        color-scheme: light;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+      }
 
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
 
-  <!-- Fixed Background Canvas -->
-  <div class="portfolio-background" aria-hidden="true">
-    <div class="bg-glow-spot bg-glow-1"></div>
-    <div class="bg-glow-spot bg-glow-2"></div>
-    <div class="bg-glow-spot bg-glow-3"></div>
-    <div class="bg-glow-spot mouse-glow" id="mouse-glow"></div>
-  </div>
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: 1rem;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
-  <!-- Custom Navigation Header -->
-  <portfolio-header></portfolio-header>
+      ::selection {
+        background: var(--blue);
+        color: #fff;
+      }
 
-  <!-- Main Contents -->
-  <main>
-    <portfolio-hero></portfolio-hero>
-    <portfolio-about></portfolio-about>
-    <portfolio-skills></portfolio-skills>
-    <portfolio-experience></portfolio-experience>
-    <portfolio-projects></portfolio-projects>
-    <github-stats></github-stats>
-    <portfolio-contact></portfolio-contact>
-  </main>
+      a {
+        color: var(--link);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        color: var(--blue);
+      }
+      :focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
 
-  <!-- Footer -->
-  <portfolio-footer></portfolio-footer>
+      .mono {
+        font-family: "IBM Plex Mono", monospace;
+      }
 
-  <!-- No-JS fallback -->
-  <noscript>
-    <div style="max-width: 640px; margin: 15vh auto; padding: 0 24px; font-family: system-ui, sans-serif; text-align: center;">
-      <h1>Nandan Devadula — Frontend Developer</h1>
-      <p>This portfolio requires JavaScript to render. In the meantime, you can find me on
-        <a href="https://github.com/devadula-nandan" style="color:#00f2fe;">GitHub</a> or
-        <a href="https://www.linkedin.com/in/nandan-devadula" style="color:#00f2fe;">LinkedIn</a>,
-        or reach me at <a href="mailto:devadula.nandan@gmail.com" style="color:#00f2fe;">devadula.nandan@gmail.com</a>.
-      </p>
-    </div>
-  </noscript>
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
 
-  <!-- Lucide Icon Library (pinned version) -->
-  <script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js" defer></script>
+      /* ---------- header ---------- */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: color-mix(in srgb, var(--paper) 88%, transparent);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        transition: box-shadow 0.25s ease;
+      }
+      header.scrolled {
+        box-shadow: var(--shadow);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 24px;
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+      .brand {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--ink);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .brand span {
+        color: var(--blue);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      nav ul {
+        display: flex;
+        gap: 22px;
+        list-style: none;
+        flex-wrap: wrap;
+      }
+      nav a {
+        font-size: 0.85rem;
+        color: var(--ink-2);
+        text-decoration: none;
+      }
+      nav a:hover {
+        color: var(--ink);
+      }
+      .theme-btn {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--ink-2);
+        padding: 4px 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+      .theme-btn:hover {
+        border-color: var(--blue);
+        color: var(--ink);
+      }
 
-  <!-- Main Application Script (ES module) -->
-  <script type="module" src="js/app.js"></script>
-</body>
+      /* ---------- section scaffolding ---------- */
+      section {
+        padding: 96px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: var(--blue);
+        margin-bottom: 28px;
+      }
+      .eyebrow::before {
+        content: "// ";
+        color: var(--ink-2);
+      }
+      h2 {
+        font-family: "IBM Plex Serif", serif;
+        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: 32px;
+        max-width: 26ch;
+      }
+
+      /* ---------- hero (the spec sheet) ---------- */
+      .hero {
+        position: relative;
+        padding: 110px 0 100px;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: 32px 32px;
+        -webkit-mask-image: radial-gradient(
+          130% 110% at 28% 22%,
+          #000 35%,
+          transparent 88%
+        );
+        mask-image: radial-gradient(
+          130% 110% at 28% 22%,
+          #000 35%,
+          transparent 88%
+        );
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+          640px 420px at 26% 38%,
+          var(--glow),
+          transparent 70%
+        );
+      }
+      .hero .wrap {
+        position: relative;
+        z-index: 1;
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 48px;
+        align-items: center;
+      }
+
+      .spec-name {
+        position: relative;
+        display: inline-block;
+        margin-top: 34px;
+      }
+      h1 {
+        font-family: "IBM Plex Serif", serif;
+        font-weight: 600;
+        font-size: clamp(2.8rem, 8vw, 5.2rem);
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+      }
+
+      /* redline annotations */
+      .redline,
+      .gapline {
+        color: var(--redline);
+        pointer-events: none;
+      }
+      .redline {
+        position: absolute;
+        top: -22px;
+        left: 2px;
+        right: 2px;
+        border-top: 1px solid currentColor;
+      }
+      .redline::before,
+      .redline::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        width: 1px;
+        height: 9px;
+        background: currentColor;
+      }
+      .redline::before {
+        left: 0;
+      }
+      .redline::after {
+        right: 0;
+      }
+      .redline b,
+      .gapline b {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--paper);
+        padding: 0 10px;
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 400;
+        font-size: 0.68rem;
+        white-space: nowrap;
+      }
+      .gapline {
+        position: relative;
+        width: 1px;
+        height: 40px;
+        margin-left: 6px;
+        background: currentColor;
+      }
+      .gapline::before,
+      .gapline::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        width: 9px;
+        height: 1px;
+        background: currentColor;
+      }
+      .gapline::before {
+        top: 0;
+      }
+      .gapline::after {
+        bottom: 0;
+      }
+      .gapline b {
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+      }
+
+      .lede {
+        max-width: 54ch;
+        font-size: 1.15rem;
+        color: var(--ink-2);
+      }
+      .lede strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .hero-links {
+        display: flex;
+        gap: 24px;
+        margin-top: 36px;
+        flex-wrap: wrap;
+      }
+      .hero-links a {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+        text-decoration: none;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2px;
+      }
+      .hero-links a:hover {
+        border-color: var(--blue);
+      }
+
+      /* portrait, framed like a spec asset */
+      .spec-asset {
+        width: 250px;
+        max-width: 100%;
+      }
+      .spec-asset .frame {
+        position: relative;
+      }
+      .spec-asset img {
+        display: block;
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(
+          0px 0px 8px
+            light-dark(rgba(15, 99, 254, 0.171), rgba(69, 137, 255, 0.26))
+        );
+      }
+      .spec-asset .frame::before,
+      .spec-asset .frame::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border: 0 solid var(--redline);
+      }
+      .spec-asset .frame::before {
+        top: -7px;
+        left: -7px;
+        border-top-width: 1px;
+        border-left-width: 1px;
+      }
+      .spec-asset .frame::after {
+        bottom: -7px;
+        right: -7px;
+        border-bottom-width: 1px;
+        border-right-width: 1px;
+      }
+      .spec-asset figcaption {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--ink-2);
+        margin-top: 12px;
+      }
+
+      /* hero load-in */
+      @media (prefers-reduced-motion: no-preference) {
+        .hero .eyebrow,
+        .spec-name h1,
+        .hero .lede,
+        .hero-links,
+        .hero .spec-asset {
+          opacity: 0;
+          translate: 0 14px;
+          animation: rise 0.7s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+        .spec-name h1 {
+          animation-delay: 0.08s;
+        }
+        .hero .lede {
+          animation-delay: 0.16s;
+        }
+        .hero-links {
+          animation-delay: 0.24s;
+        }
+        .hero .spec-asset {
+          animation-delay: 0.2s;
+        }
+        .redline,
+        .gapline {
+          opacity: 0;
+          animation: appear 0.5s ease 0.8s forwards;
+        }
+        @keyframes rise {
+          to {
+            opacity: 1;
+            translate: 0 0;
+          }
+        }
+        @keyframes appear {
+          to {
+            opacity: 1;
+          }
+        }
+
+        .reveal {
+          opacity: 0;
+          translate: 0 18px;
+          transition:
+            opacity 0.6s ease,
+            translate 0.6s ease;
+        }
+        .reveal.in {
+          opacity: 1;
+          translate: 0 0;
+        }
+      }
+
+      /* ---------- about ---------- */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 56px;
+        align-items: end;
+      }
+      .about-grid p {
+        color: var(--ink-2);
+        max-width: 60ch;
+      }
+      .about-grid p + p {
+        margin-top: 16px;
+      }
+      .about-grid p strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .props {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.82rem;
+      }
+      .props div {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .props dt {
+        color: var(--ink-2);
+        font-weight: 400;
+      }
+      .props dd {
+        text-align: right;
+      }
+
+      /* ---------- experience ---------- */
+      .job {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 24px;
+        padding: 36px 0;
+      }
+      .job + .job {
+        border-top: 1px solid var(--border);
+      }
+      .job time {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.8rem;
+        color: var(--ink-2);
+        padding-top: 4px;
+      }
+      .job time::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border: 1px solid var(--blue);
+        margin-right: 12px;
+        vertical-align: 1px;
+      }
+      .job:first-of-type time::before {
+        background: var(--blue);
+      }
+      .job h3 {
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+      .job .place {
+        color: var(--blue);
+        font-weight: 500;
+      }
+      .job .meta {
+        font-size: 0.85rem;
+        color: var(--ink-2);
+        margin: 2px 0 14px;
+      }
+      .job ul {
+        list-style: none;
+        color: var(--ink-2);
+      }
+      .job li {
+        padding-left: 18px;
+        position: relative;
+        margin-bottom: 8px;
+      }
+      .job li::before {
+        content: "—";
+        position: absolute;
+        left: 0;
+        color: var(--blue);
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .tag {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.72rem;
+        background: var(--chip);
+        color: var(--ink-2);
+        padding: 3px 10px;
+        border-radius: 999px;
+      }
+
+      .edu {
+        margin-top: 48px;
+        padding-top: 28px;
+        border-top: 1px solid var(--border);
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 24px;
+        font-size: 0.9rem;
+        color: var(--ink-2);
+      }
+      .edu .mono {
+        font-size: 0.8rem;
+        padding-top: 2px;
+      }
+      .edu p + p {
+        margin-top: 8px;
+      }
+      .edu strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      /* ---------- projects ---------- */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: border-color 0.2s ease;
+      }
+      .card:hover {
+        border-color: var(--blue);
+      }
+      .card h3 {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+      .card h3 a {
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .card h3 a::after {
+        content: " ↗";
+        color: var(--blue);
+        font-size: 0.85em;
+      }
+      .card p {
+        font-size: 0.9rem;
+        color: var(--ink-2);
+        flex: 1;
+      }
+      .card .topics {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--ink-2);
+      }
+      .card .topics span::before {
+        content: "#";
+        color: var(--blue);
+      }
+      .card .topics span {
+        margin-right: 10px;
+      }
+      .more-repos {
+        margin-top: 28px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+      }
+
+      /* ---------- github stats ---------- */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 24px;
+        margin-bottom: 48px;
+      }
+      .stats dt {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--ink-2);
+        margin-bottom: 6px;
+      }
+      .stats dd {
+        font-family: "IBM Plex Serif", serif;
+        font-size: 2.4rem;
+        font-weight: 600;
+        line-height: 1.1;
+      }
+      .langbar {
+        display: flex;
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+      .lang-legend {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--ink-2);
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .lang-legend i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        margin-right: 6px;
+      }
+
+      /* ---------- skills ---------- */
+      .skill-groups {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 40px 32px;
+      }
+      .skill-groups h3 {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--ink-2);
+        margin-bottom: 16px;
+        letter-spacing: 0.04em;
+      }
+      .skill-groups h3::before {
+        content: "· ";
+        color: var(--blue);
+      }
+      .skill-groups .tags {
+        margin-top: 0;
+      }
+      .skill-groups .tag {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+        color: var(--ink);
+      }
+
+      /* ---------- contact + assistant ---------- */
+      .contact h2 {
+        max-width: 20ch;
+      }
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        gap: 56px;
+        align-items: start;
+      }
+      .contact .big-mail {
+        display: inline-block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: clamp(1.05rem, 3vw, 1.35rem);
+        margin: 8px 0 28px;
+      }
+      .contact-meta {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+        color: var(--ink-2);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .chat {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        height: 380px;
+      }
+      .chat-top {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--ink-2);
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .chat-top .tilde {
+        color: var(--blue);
+      }
+      .chat-title {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .chat-status {
+        white-space: nowrap;
+      }
+      .chat-status.on {
+        color: light-dark(#198038, #42be65);
+      } /* carbon green-60 / green-40 */
+      .chat-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--ink-2);
+        font-size: 0.95rem;
+        line-height: 1;
+        padding: 2px;
+      }
+      .chat-btn:hover {
+        color: var(--blue);
+      }
+
+      /* typing caret */
+      .msg.bot.typing::after {
+        content: "▍";
+        color: var(--blue);
+        animation: blink 1s steps(2) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* maximized chat — inline top/left/width/height set by JS, transitioned from its on-page rect */
+      .chat.max {
+        border-radius: 0;
+        border: none;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .chat.max {
+          transition:
+            top 0.4s cubic-bezier(0.2, 0, 0.2, 1),
+            left 0.4s cubic-bezier(0.2, 0, 0.2, 1),
+            width 0.4s cubic-bezier(0.2, 0, 0.2, 1),
+            height 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+      }
+      .chat-log {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        font-size: 0.9rem;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      .msg {
+        max-width: 90%;
+      }
+      .msg.you {
+        align-self: flex-end;
+        background: var(--chip);
+        padding: 8px 12px;
+        border-radius: 4px 4px 0 4px;
+      }
+      .msg.bot {
+        color: var(--ink-2);
+      }
+      .msg.bot::before {
+        content: "nandan.assistant ▸";
+        display: block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--blue);
+        margin-bottom: 3px;
+      }
+      .chat-form {
+        display: flex;
+        border-top: 1px solid var(--border);
+      }
+      .chat-form input {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 16px;
+        background: none;
+        border: none;
+        color: var(--ink);
+        font: inherit;
+        font-size: 0.9rem;
+      }
+      .chat-form input::placeholder {
+        color: var(--ink-2);
+      }
+      .chat-form button {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.8rem;
+        background: none;
+        border: none;
+        border-left: 1px solid var(--border);
+        color: var(--blue);
+        padding: 0 20px;
+        cursor: pointer;
+      }
+      .chat-form button:hover {
+        background: var(--chip);
+      }
+
+      footer {
+        padding: 28px 0 40px;
+      }
+      footer .wrap {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--ink-2);
+      }
+      footer a {
+        color: var(--ink-2);
+      }
+
+      /* ---------- responsive ---------- */
+      @media (max-width: 760px) {
+        section {
+          padding: 72px 0;
+        }
+        .hero {
+          padding: 72px 0 64px;
+        }
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .hero .spec-asset {
+          width: 200px;
+        }
+        .about-grid,
+        .job,
+        .edu,
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+        .about-grid {
+          gap: 36px;
+        }
+        .job time {
+          padding-top: 0;
+        }
+        .redline b {
+          font-size: 0.6rem;
+        }
+        .rl-x {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <a class="brand" href="#top"><span>~/</span>nandan</a>
+        <div class="nav-right">
+          <nav aria-label="Primary">
+            <ul>
+              <li><a href="#about">About</a></li>
+              <li><a href="#experience">Experience</a></li>
+              <li><a href="#work">Work</a></li>
+              <li><a href="#skills">Skills</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+          <button
+            class="theme-btn"
+            id="theme-btn"
+            type="button"
+            aria-label="Theme: auto"
+          >
+            ◐ auto
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ================= hero ================= -->
+      <section class="hero" aria-label="Introduction">
+        <div class="wrap">
+          <p class="eyebrow">user.hero — frontend engineer, Kochi IN</p>
+
+          <div class="hero-grid">
+            <div>
+              <div class="spec-name">
+                <span class="redline" aria-hidden="true"
+                  ><b
+                    >display-01<span class="rl-x">
+                      · IBM Plex Serif 600</span
+                    ></b
+                  ></span
+                >
+                <h1>Nandan<br />Devadula</h1>
+              </div>
+
+              <div class="gapline" aria-hidden="true">
+                <b>$spacing-08 · 40px</b>
+              </div>
+
+              <p class="lede">
+                I build the <strong>Carbon Design System</strong> at IBM —
+                accessible, enterprise-grade web components shipped to hundreds
+                of products. Pixel-perfect, WCAG-compliant, and inclusive by
+                design.
+              </p>
+
+              <div class="hero-links">
+                <a
+                  href="https://github.com/devadula-nandan"
+                  target="_blank"
+                  rel="noopener"
+                  >github</a
+                >
+                <a
+                  href="https://www.linkedin.com/in/nandan-devadula"
+                  target="_blank"
+                  rel="noopener"
+                  >linkedin</a
+                >
+                <a
+                  href="https://drive.google.com/file/d/1gtAMviM329eqGWURrzCcOWMZM2PIkAjC/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener"
+                  >résumé</a
+                >
+                <a href="mailto:devadula.nandan@gmail.com">email</a>
+              </div>
+            </div>
+
+            <figure class="spec-asset">
+              <div class="frame">
+                <img
+                  src="https://avatars.githubusercontent.com/u/47176249?s=400"
+                  alt="Nandan Devadula"
+                  width="400"
+                  height="400"
+                />
+              </div>
+              <figcaption>fig. 01 — avatar · 400 × 400</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= about ================= -->
+      <section id="about">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.about</p>
+          <div class="about-grid">
+            <div>
+              <h2>Design systems are promises kept at scale.</h2>
+              <p>
+                I'm a frontend developer on IBM's
+                <strong>Carbon Design System</strong> team, building components
+                for <strong>Carbon for IBM Products</strong> and
+                <strong>Carbon for AI</strong> — work that directly shapes the
+                experience of enterprise software used around the world.
+              </p>
+              <p>
+                Before IBM, I built financial dashboards and real-time data UIs
+                at HCLTech. I care deeply about accessibility, component
+                modularity, and the kind of craft you only notice when it's
+                missing.
+              </p>
+            </div>
+            <dl class="props" aria-label="Quick facts">
+              <div>
+                <dt>experience</dt>
+                <dd>5+ years</dd>
+              </div>
+              <div>
+                <dt>current</dt>
+                <dd>IBM · Carbon</dd>
+              </div>
+              <div>
+                <dt>open_source</dt>
+                <dd>40+ repos</dd>
+              </div>
+              <div>
+                <dt>focus</dt>
+                <dd>WCAG · a11y</dd>
+              </div>
+              <div>
+                <dt>stack</dt>
+                <dd>TS · Lit · React</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= experience ================= -->
+      <section id="experience">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.experience</p>
+          <h2>Where I've worked</h2>
+
+          <article class="job">
+            <time>2023 — present</time>
+            <div>
+              <h3>Frontend Developer · <span class="place">IBM</span></h3>
+              <p class="meta">Kochi, Kerala · Hybrid</p>
+              <ul>
+                <li>
+                  Develop and maintain accessible, enterprise-grade components
+                  for Carbon for IBM Products and Carbon for AI.
+                </li>
+                <li>
+                  Prototype new UI paradigms in Carbon Labs — IBM's space for
+                  rapid frontend innovation.
+                </li>
+                <li>
+                  Drive WCAG compliance with unit, E2E, and automated
+                  accessibility testing.
+                </li>
+              </ul>
+              <div class="tags">
+                <span class="tag">Carbon Design System</span
+                ><span class="tag">Web Components</span>
+                <span class="tag">TypeScript</span><span class="tag">Lit</span>
+                <span class="tag">WCAG</span><span class="tag">Playwright</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="job">
+            <time>2022 — 2023</time>
+            <div>
+              <h3>
+                Software Engineer · <span class="place">HCL Technologies</span>
+              </h3>
+              <p class="meta">Hyderabad, Telangana · On-site</p>
+              <ul>
+                <li>
+                  Built responsive UI components for financial dashboards and
+                  reporting tools.
+                </li>
+                <li>
+                  Integrated RESTful APIs with backend teams for real-time data
+                  across applications.
+                </li>
+                <li>Diagnosed UI bugs and shipped performance enhancements.</li>
+              </ul>
+              <div class="tags">
+                <span class="tag">React</span><span class="tag">Redux</span>
+                <span class="tag">REST APIs</span><span class="tag">Jest</span
+                ><span class="tag">Cypress</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="job">
+            <time>2021 — 2022</time>
+            <div>
+              <h3>Web UI Developer · <span class="place">Ochre Media</span></h3>
+              <p class="meta">Secunderabad, Telangana · On-site</p>
+              <ul>
+                <li>
+                  Designed and developed websites, microsites, and newsletters
+                  for B2B clients.
+                </li>
+                <li>
+                  Created product pages and inquiry forms that improved
+                  engagement and conversion.
+                </li>
+              </ul>
+              <div class="tags">
+                <span class="tag">HTML5</span><span class="tag">CSS</span>
+                <span class="tag">JavaScript</span
+                ><span class="tag">Bootstrap</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="edu">
+            <span class="mono">education</span>
+            <div>
+              <p>
+                <strong>B.E. Electronics &amp; Communication</strong> — Andhra
+                University (GVP College of Engineering), 2014–2018
+              </p>
+              <p>
+                <strong>Certificate, Software Development</strong> — Great
+                Learning, 2021
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= projects ================= -->
+      <section id="work">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.projects</p>
+          <h2>Selected open-source work</h2>
+
+          <div class="cards">
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/wc-audio-input"
+                  target="_blank"
+                  rel="noopener"
+                  >wc-audio-input</a
+                >
+              </h3>
+              <p>
+                Audio input web component with speech-to-text support. Native
+                Web Components + TypeScript.
+              </p>
+              <p class="topics">
+                <span>web-components</span><span>speech-to-text</span
+                ><span>typescript</span>
+              </p>
+            </article>
+
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/wc-resizer"
+                  target="_blank"
+                  rel="noopener"
+                  >wc-resizer</a
+                >
+              </h3>
+              <p>
+                Lightweight, reusable container-resizer web component for
+                flexbox layouts.
+              </p>
+              <p class="topics">
+                <span>web-components</span><span>typescript</span
+                ><span>ui-component</span>
+              </p>
+            </article>
+
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/storybook-theme-carbon"
+                  target="_blank"
+                  rel="noopener"
+                  >storybook-theme-carbon</a
+                >
+              </h3>
+              <p>
+                Storybook themes and layouts tailored to IBM's Carbon Design
+                System aesthetics.
+              </p>
+              <p class="topics">
+                <span>storybook</span><span>carbon</span><span>scss</span>
+              </p>
+            </article>
+
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/TD-TABLE"
+                  target="_blank"
+                  rel="noopener"
+                  >TD-TABLE</a
+                >
+              </h3>
+              <p>
+                Interactive data-table playground powered by TanStack Table v8,
+                Tailwind, and DaisyUI.
+              </p>
+              <p class="topics">
+                <span>tanstack-table</span><span>tailwind</span
+                ><span>react</span>
+              </p>
+            </article>
+
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/Flask_Restaurant_Application_Great_Learning"
+                  target="_blank"
+                  rel="noopener"
+                  >flask-restaurant</a
+                >
+              </h3>
+              <p>
+                Full-stack restaurant ordering app — Flask backend with modular
+                HTML/CSS frontend.
+              </p>
+              <p class="topics">
+                <span>flask</span><span>python</span><span>sql</span>
+              </p>
+            </article>
+
+            <article class="card">
+              <h3>
+                <a
+                  href="https://github.com/devadula-nandan/Todo_application_with_vanilla_js"
+                  target="_blank"
+                  rel="noopener"
+                  >vanilla-js-todo</a
+                >
+              </h3>
+              <p>
+                Todo app in pure JavaScript with optimized DOM-manipulation
+                techniques.
+              </p>
+              <p class="topics"><span>vanilla-js</span><span>dom</span></p>
+            </article>
+          </div>
+
+          <p class="more-repos">
+            →
+            <a
+              href="https://github.com/devadula-nandan?tab=repositories"
+              target="_blank"
+              rel="noopener"
+              >all 40+ repositories on GitHub</a
+            >
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= github stats ================= -->
+      <section id="github" aria-label="GitHub statistics">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.github_stats</p>
+          <h2>Open source, by the numbers</h2>
+          <dl class="stats">
+            <div>
+              <dt>repositories</dt>
+              <dd id="s-repos" data-target="43">43</dd>
+            </div>
+            <div>
+              <dt>stars earned</dt>
+              <dd id="s-stars" data-target="25">25</dd>
+            </div>
+            <div>
+              <dt>languages</dt>
+              <dd id="s-langs" data-target="5">5</dd>
+            </div>
+            <div>
+              <dt>followers</dt>
+              <dd id="s-followers" data-target="18">18</dd>
+            </div>
+          </dl>
+          <div class="langbar" id="langbar" aria-hidden="true"></div>
+          <p
+            class="lang-legend"
+            id="langlegend"
+            aria-label="Language breakdown"
+          ></p>
+        </div>
+      </section>
+
+      <!-- ================= skills ================= -->
+      <section id="skills">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.skills</p>
+          <h2>Tools of the trade</h2>
+
+          <div class="skill-groups">
+            <div>
+              <h3>languages</h3>
+              <div class="tags">
+                <span class="tag">TypeScript</span
+                ><span class="tag">JavaScript</span>
+                <span class="tag">HTML5</span><span class="tag">CSS / SCSS</span
+                ><span class="tag">Python</span>
+              </div>
+            </div>
+            <div>
+              <h3>components &amp; ui</h3>
+              <div class="tags">
+                <span class="tag">Web Components</span
+                ><span class="tag">Lit</span> <span class="tag">React</span
+                ><span class="tag">Redux</span>
+                <span class="tag">Carbon Design System</span
+                ><span class="tag">Tailwind CSS</span>
+              </div>
+            </div>
+            <div>
+              <h3>testing &amp; a11y</h3>
+              <div class="tags">
+                <span class="tag">Jest</span><span class="tag">Cypress</span>
+                <span class="tag">Playwright</span><span class="tag">WCAG</span
+                ><span class="tag">WAI-ARIA</span>
+              </div>
+            </div>
+            <div>
+              <h3>data &amp; apis</h3>
+              <div class="tags">
+                <span class="tag">REST APIs</span><span class="tag">MySQL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= contact ================= -->
+      <section id="contact" class="contact">
+        <div class="wrap reveal">
+          <p class="eyebrow">user.contact</p>
+          <h2>Let's build something accessible.</h2>
+          <div class="contact-grid">
+            <div>
+              <a class="big-mail" href="mailto:devadula.nandan@gmail.com"
+                >devadula.nandan@gmail.com</a
+              >
+              <div class="contact-meta">
+                <span>+91 70323 28703</span>
+                <a
+                  href="https://github.com/devadula-nandan"
+                  target="_blank"
+                  rel="noopener"
+                  >github</a
+                >
+                <a
+                  href="https://www.linkedin.com/in/nandan-devadula"
+                  target="_blank"
+                  rel="noopener"
+                  >linkedin</a
+                >
+                <a
+                  href="https://drive.google.com/file/d/1gtAMviM329eqGWURrzCcOWMZM2PIkAjC/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener"
+                  >résumé ↗</a
+                >
+              </div>
+            </div>
+            <div class="chat">
+              <div class="chat-top">
+                <span class="chat-title"
+                  ><span class="tilde">~/</span>assistant</span
+                >
+                <span class="chat-status" id="chat-status">● connecting…</span>
+                <button
+                  class="chat-btn"
+                  id="chat-reset"
+                  type="button"
+                  aria-label="Reset conversation"
+                  title="Reset"
+                >
+                  ↺
+                </button>
+                <button
+                  class="chat-btn"
+                  id="chat-max"
+                  type="button"
+                  aria-label="Maximize chat"
+                  title="Maximize"
+                >
+                  ⤢
+                </button>
+              </div>
+              <div class="chat-log" id="chat-log" aria-live="polite"></div>
+              <form class="chat-form" id="chat-form">
+                <input
+                  id="chat-input"
+                  type="text"
+                  maxlength="500"
+                  placeholder="e.g. What do you do at IBM?"
+                  aria-label="Message the assistant"
+                  autocomplete="off"
+                />
+                <button type="submit">send ↵</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>© <span id="year">2026</span> Nandan Devadula</span>
+        <span
+          >designed as a spec · built by hand ·
+          <a
+            href="https://github.com/devadula-nandan/Portfolio"
+            target="_blank"
+            rel="noopener"
+            >source</a
+          ></span
+        >
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      /* ---------- theme switcher: auto → light → dark ---------- */
+      const themeBtn = document.getElementById("theme-btn");
+      const THEMES = ["auto", "light", "dark"];
+      const THEME_ICONS = { auto: "◐", light: "○", dark: "●" };
+
+      function applyTheme(t) {
+        if (t === "auto") {
+          delete document.documentElement.dataset.theme;
+          localStorage.removeItem("theme");
+        } else {
+          document.documentElement.dataset.theme = t;
+          localStorage.setItem("theme", t);
+        }
+        themeBtn.textContent = `${THEME_ICONS[t]} ${t}`;
+        themeBtn.setAttribute("aria-label", "Theme: " + t);
+      }
+
+      let theme = ["light", "dark"].includes(localStorage.getItem("theme"))
+        ? localStorage.getItem("theme")
+        : "auto";
+      applyTheme(theme);
+      themeBtn.addEventListener("click", () => {
+        theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+        applyTheme(theme);
+      });
+
+      /* ---------- header shadow on scroll ---------- */
+      const headerEl = document.querySelector("header");
+      addEventListener(
+        "scroll",
+        () => headerEl.classList.toggle("scrolled", scrollY > 8),
+        { passive: true },
+      );
+
+      /* ---------- scroll reveals + stat count-up ---------- */
+      /* count-up reads data-target each frame, so a late GitHub fetch still lands on the right number */
+      function animateCount(el) {
+        const dur = 900,
+          t0 = performance.now();
+        const step = (t) => {
+          const p = Math.min((t - t0) / dur, 1);
+          el.textContent = Math.round(
+            +el.dataset.target * (1 - Math.pow(1 - p, 3)),
+          );
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+
+      if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries)
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                if (e.target.closest("#github"))
+                  e.target.querySelectorAll(".stats dd").forEach(animateCount);
+                io.unobserve(e.target);
+              }
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      }
+
+      /* ---------- chat assistant (POST /api/chat) ---------- */
+      const chatLog = document.getElementById("chat-log");
+      const chatInput = document.getElementById("chat-input");
+
+      /* GET /api/health → { ok } — is the Gemini-backed assistant live? */
+      (async () => {
+        const status = document.getElementById("chat-status");
+        try {
+          const { ok } = await (await fetch("/api/health")).json();
+          status.textContent = ok ? "● online" : "● fallback";
+          status.classList.toggle("on", ok);
+        } catch {
+          status.textContent = "● fallback";
+        }
+      })();
+
+      function addMsg(who, text) {
+        const div = document.createElement("div");
+        div.className = "msg " + who;
+        div.textContent = text;
+        chatLog.appendChild(div);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return div;
+      }
+
+      /* typewriter — one active typing at a time; starting a new one completes the previous instantly */
+      let typing = null; // { el, text, timer }
+      function finishTyping() {
+        if (!typing) return;
+        clearTimeout(typing.timer);
+        typing.el.textContent = typing.text;
+        typing.el.classList.remove("typing");
+        typing = null;
+      }
+      function typeInto(el, text) {
+        finishTyping();
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          el.textContent = text;
+          chatLog.scrollTop = chatLog.scrollHeight;
+          return;
+        }
+        el.textContent = "";
+        el.classList.add("typing");
+        typing = { el, text, timer: 0 };
+        let i = 0;
+        const tick = () => {
+          el.textContent = text.slice(0, ++i);
+          chatLog.scrollTop = chatLog.scrollHeight;
+          if (i < text.length) typing.timer = setTimeout(tick, 14);
+          else {
+            el.classList.remove("typing");
+            typing = null;
+          }
+        };
+        tick();
+      }
+
+      /* greeting types itself the first time the chat scrolls into view */
+      const chatEl = document.querySelector(".chat");
+      const GREETING =
+        "Hi! I'm Nandan's virtual assistant. Ask me about my work on IBM Carbon, my experience, my tech stack, or how to reach me.";
+      const greetIO = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            greetIO.disconnect();
+            typeInto(addMsg("bot", ""), GREETING);
+          }
+        },
+        { threshold: 0.4 },
+      );
+      greetIO.observe(chatEl);
+
+      document
+        .getElementById("chat-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const message = chatInput.value.trim();
+          if (!message) return;
+          addMsg("you", message);
+          chatInput.value = "";
+          const pending = addMsg("bot", "…");
+          try {
+            const res = await fetch("/api/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message }),
+            });
+            const data = await res.json();
+            typeInto(
+              pending,
+              (
+                data.reply ||
+                "Sorry, I couldn't come up with a response to that."
+              ).replace(/\*\*?/g, ""),
+            );
+          } catch {
+            typeInto(
+              pending,
+              "I seem to be offline — email me directly at devadula.nandan@gmail.com.",
+            );
+          }
+        });
+
+      /* reset — clear the log and re-type the greeting */
+      document.getElementById("chat-reset").addEventListener("click", () => {
+        finishTyping();
+        chatLog.textContent = "";
+        typeInto(addMsg("bot", ""), GREETING);
+      });
+
+      /* maximize — pin the chat at its current rect, then transition to the full viewport (and back) */
+      const maxBtn = document.getElementById("chat-max");
+      const chatPh = document.createElement("div"); // placeholder keeps the grid cell from collapsing
+      chatPh.hidden = true;
+      chatEl.before(chatPh);
+      let maximized = false;
+
+      function setRect(r) {
+        Object.assign(chatEl.style, {
+          top: r.top + "px",
+          left: r.left + "px",
+          width: r.width + "px",
+          height: r.height + "px",
+        });
+      }
+
+      function toggleMax() {
+        const instant = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!maximized) {
+          const r = chatEl.getBoundingClientRect();
+          chatPh.style.height = r.height + "px";
+          chatPh.hidden = false;
+          chatEl.style.position = "fixed";
+          chatEl.style.zIndex = "100";
+          setRect(r);
+          chatEl.classList.add("max");
+          document.body.style.overflow = "hidden";
+          requestAnimationFrame(() => {
+            setRect({
+              top: 0,
+              left: 0,
+              width: innerWidth,
+              height: innerHeight,
+            });
+          });
+        } else {
+          setRect(chatPh.getBoundingClientRect());
+          const done = (e) => {
+            if (e && e.propertyName !== "height") return;
+            if (maximized) return; // user re-maximized before cleanup fired
+            chatEl.removeEventListener("transitionend", done);
+            chatEl.classList.remove("max");
+            chatEl.removeAttribute("style");
+            chatPh.hidden = true;
+            document.body.style.overflow = "";
+          };
+          if (instant) done();
+          else {
+            chatEl.addEventListener("transitionend", done);
+            setTimeout(done, 500); // fallback if transitionend never fires (throttled tab, interrupted transition)
+          }
+        }
+        maximized = !maximized;
+        maxBtn.textContent = maximized ? "⤡" : "⤢";
+        const label = maximized ? "Restore chat" : "Maximize chat";
+        maxBtn.setAttribute("aria-label", label);
+        maxBtn.title = label.split(" ")[0];
+      }
+
+      maxBtn.addEventListener("click", toggleMax);
+      addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && maximized) toggleMax();
+      });
+
+      /* ---------- github stats (live, with static fallback already in markup) ---------- */
+      const LANG_COLORS = [
+        "#0f62fe",
+        "#4589ff",
+        "#78a9ff",
+        "#a6c8ff",
+        "#d0e2ff",
+      ];
+      const FALLBACK_LANGS = {
+        JavaScript: 45,
+        TypeScript: 30,
+        Python: 12,
+        HTML: 8,
+        CSS: 5,
+      };
+
+      function renderLangs(langs) {
+        const top = Object.entries(langs)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+        const total = top.reduce((n, [, c]) => n + c, 0);
+        const bar = document.getElementById("langbar");
+        const legend = document.getElementById("langlegend");
+        bar.textContent = "";
+        legend.textContent = "";
+        top.forEach(([name, count], i) => {
+          const pct = Math.round((count / total) * 100);
+          const seg = document.createElement("span");
+          seg.style.cssText = `width:${pct}%;background:${LANG_COLORS[i]}`;
+          bar.appendChild(seg);
+          const item = document.createElement("span");
+          const dot = document.createElement("i");
+          dot.style.background = LANG_COLORS[i];
+          item.append(dot, `${name} ${pct}%`);
+          legend.appendChild(item);
+        });
+      }
+
+      renderLangs(FALLBACK_LANGS);
+
+      (async () => {
+        try {
+          const base = "https://api.github.com/users/devadula-nandan";
+          const [user, repos] = await Promise.all([
+            fetch(base).then((r) => (r.ok ? r.json() : Promise.reject())),
+            fetch(base + "/repos?per_page=100").then((r) =>
+              r.ok ? r.json() : Promise.reject(),
+            ),
+          ]);
+          const set = (id, v) => {
+            const el = document.getElementById(id);
+            el.dataset.target = v;
+            el.textContent = v;
+          };
+          set("s-repos", user.public_repos);
+          set("s-followers", user.followers);
+          set(
+            "s-stars",
+            repos.reduce((n, r) => n + r.stargazers_count, 0),
+          );
+          const langs = {};
+          repos.forEach((r) => {
+            if (r.language) langs[r.language] = (langs[r.language] || 0) + 1;
+          });
+          if (Object.keys(langs).length) {
+            set("s-langs", Object.keys(langs).length);
+            renderLangs(langs);
+          }
+        } catch {
+          /* static fallback numbers stay */
+        }
+      })();
+    </script>
+  </body>
 </html>
