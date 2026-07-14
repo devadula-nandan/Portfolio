@@ -2,9 +2,9 @@ const { setCorsHeaders } = require('../lib/cors.js');
 
 // Available models ordered from highest to lowest quality
 const MODELS_HIERARCHY = [
-  'gemini-2.5-pro',
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-lite'
+  'gemini-3.1-pro',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite'
 ];
 
 // Helper to determine the fallback chain based on preferred model
@@ -17,11 +17,11 @@ function getFallbackChain(preferredModel) {
     }
   } else {
     // Default fallback starting point if preferred model is not matched
-    chain.push('gemini-2.5-flash-lite');
+    chain.push('gemini-3.1-flash-lite');
   }
 
-  // Ensure ultimate fallbacks are included in case the 2.5 names have issues
-  const ultimateFallbacks = ['gemini-flash-lite-latest', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+  // Ensure ultimate fallbacks are included in case the 3.x names have issues
+  const ultimateFallbacks = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
   for (const model of ultimateFallbacks) {
     if (!chain.includes(model)) {
       chain.push(model);
