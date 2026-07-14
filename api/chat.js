@@ -2,9 +2,10 @@ const { setCorsHeaders } = require('../lib/cors.js');
 
 // Available models ordered from highest to lowest quality
 const MODELS_HIERARCHY = [
-  'gemini-3.1-pro',
   'gemini-3.5-flash',
-  'gemini-3.1-flash-lite'
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite'
 ];
 
 // Helper to determine the fallback chain based on preferred model
@@ -20,8 +21,8 @@ function getFallbackChain(preferredModel) {
     chain.push('gemini-3.1-flash-lite');
   }
 
-  // Ensure ultimate fallbacks are included in case the 3.x names have issues
-  const ultimateFallbacks = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+  // Ensure ultimate fallbacks are included
+  const ultimateFallbacks = ['gemini-flash-lite-latest', 'gemini-flash-latest'];
   for (const model of ultimateFallbacks) {
     if (!chain.includes(model)) {
       chain.push(model);
