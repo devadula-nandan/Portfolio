@@ -2055,14 +2055,20 @@ Facts about you:
             typeInto(pending, strip(data.reply));
 
             if (data.modelUsed && data.modelUsed !== preferredCloudModel) {
-              const oldModelName = getFriendlyModelName(preferredCloudModel);
-              const newModelName = getFriendlyModelName(data.modelUsed);
               preferredCloudModel = data.modelUsed;
               modelSelect.value = preferredCloudModel;
-              
-              setTimeout(() => {
-                addMsg("system", `${oldModelName} rate-limited. Auto-switched to ${newModelName}.`);
-              }, 600);
+            }
+
+            if (Array.isArray(data.rateLimitedModels)) {
+              data.rateLimitedModels.forEach((modelId) => {
+                const option = modelSelect.querySelector(`option[value="${modelId}"]`);
+                if (option) {
+                  option.disabled = true;
+                  if (!option.textContent.includes("(Rate Limited)")) {
+                    option.textContent += " (Rate Limited)";
+                  }
+                }
+              });
             }
           } else {
             history.pop();

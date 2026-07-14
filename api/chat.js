@@ -102,6 +102,7 @@ module.exports = async function handler(req, res) {
   let reply = null;
   let modelUsed = null;
   let lastError = null;
+  const rateLimitedModels = [];
 
   const fallbackChain = getFallbackChain(req.body?.preferredModel);
 
@@ -123,6 +124,7 @@ module.exports = async function handler(req, res) {
         const errorBody = await geminiRes.text();
         console.warn(`Model ${model} rate-limited or quota exceeded (status ${geminiRes.status}): ${errorBody}. Trying next fallback...`);
         lastError = { status: geminiRes.status, body: errorBody };
+        rateLimitedModels.push(model);
         continue;
       }
 
@@ -130,6 +132,7 @@ module.exports = async function handler(req, res) {
         const errorBody = await geminiRes.text();
         console.warn(`Model ${model} failed with status ${geminiRes.status}: ${errorBody}. Trying next fallback...`);
         lastError = { status: geminiRes.status, body: errorBody };
+        rateLimitedModels.push(model);
         continue;
       }
 
@@ -142,10 +145,12 @@ module.exports = async function handler(req, res) {
       } else {
         console.warn(`Model ${model} returned empty response candidates. Trying next fallback...`);
         lastError = { status: 200, body: 'No candidates returned' };
+        rateLimitedModels.push(model);
       }
     } catch (err) {
       console.error(`Error executing model ${model}:`, err?.message);
       lastError = { status: 500, body: err?.message };
+      rateLimitedModels.push(model);
     }
   }
 
@@ -158,5 +163,5 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  res.status(200).json({ reply, modelUsed });
+  res.status(200).json({ reply, modelUsed, rateLimitedModels });
 };
