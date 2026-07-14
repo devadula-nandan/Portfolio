@@ -215,12 +215,23 @@
         border: 1px solid var(--border);
         border-radius: 999px;
         color: var(--ink-2);
-        padding: 4px 12px;
+        padding: 4px 8px;
         cursor: pointer;
         white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 74px;
         transition:
           border-color 0.2s ease,
           color 0.2s ease;
+      }
+      .theme-btn svg,
+      .chat-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+        display: block;
       }
       .theme-btn:hover {
         border-color: var(--blue);
@@ -402,9 +413,18 @@
         text-decoration: none;
         border-bottom: 1px solid var(--border);
         padding-bottom: 2px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
       }
       .hero-links a:hover {
         border-color: var(--blue);
+      }
+      .hero-links a svg {
+        width: 15px;
+        height: 15px;
+        fill: currentColor;
+        flex-shrink: 0;
       }
 
       /* portrait, framed like a spec asset */
@@ -500,7 +520,7 @@
         }
         .reveal.in {
           opacity: 1;
-          translate: 0 0;
+          translate: none; /* not "0 0" — a non-none translate would trap position:fixed children (maximized chat) */
         }
       }
 
@@ -733,6 +753,52 @@
         border-radius: 2px;
         margin-right: 6px;
       }
+      .heatmap-block {
+        margin-top: 48px;
+      }
+      .hm-title {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--ink-2);
+        margin-bottom: 16px;
+        letter-spacing: 0.04em;
+      }
+      .hm-title::before {
+        content: "· ";
+        color: var(--blue);
+      }
+      .heatmap {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(7, 10px);
+        grid-auto-columns: 10px;
+        gap: 3px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+      .heatmap i {
+        border-radius: 2px;
+        background: var(--chip);
+      }
+      .heatmap .lv1 {
+        background: light-dark(#d0e2ff, #002d9c);
+      }
+      .heatmap .lv2 {
+        background: light-dark(#a6c8ff, #0043ce);
+      }
+      .heatmap .lv3 {
+        background: light-dark(#4589ff, #0f62fe);
+      }
+      .heatmap .lv4 {
+        background: light-dark(#0f62fe, #78a9ff);
+      }
+      .hm-caption {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--ink-2);
+        margin-top: 10px;
+      }
 
       /* ---------- skills ---------- */
       .skill-groups {
@@ -786,6 +852,19 @@
         gap: 12px;
         align-items: flex-start;
       }
+      .contact-meta a,
+      .contact-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .contact-meta svg {
+        width: 15px;
+        height: 15px;
+        fill: currentColor;
+        flex-shrink: 0;
+        color: var(--ink-2);
+      }
 
       .chat {
         background: var(--surface);
@@ -832,6 +911,32 @@
       }
       .chat-btn:hover {
         color: var(--blue);
+      }
+      .chat-mode {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--ink-2);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+      .chat-mode:hover {
+        border-color: var(--blue);
+        color: var(--ink);
+      }
+      .chat-mode svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
       }
 
       /* typing caret */
@@ -907,6 +1012,7 @@
       }
       .chat-form input::placeholder {
         color: var(--ink-2);
+        opacity: 0.55;
       }
       .chat-form button {
         font-family: "IBM Plex Mono", monospace;
@@ -917,6 +1023,14 @@
         color: var(--blue);
         padding: 0 20px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .chat-form button svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
       }
       .chat-form button:hover {
         background: var(--chip);
@@ -994,7 +1108,7 @@
             type="button"
             aria-label="Theme: auto"
           >
-            ◐ auto
+            auto
           </button>
         </div>
       </div>
@@ -1032,24 +1146,29 @@
 
               <div class="hero-links">
                 <a
+                  data-icon="github"
                   href="https://github.com/devadula-nandan"
                   target="_blank"
                   rel="noopener"
-                  >github</a
+                  ><span>github</span></a
                 >
                 <a
+                  data-icon="linkedin"
                   href="https://www.linkedin.com/in/nandan-devadula"
                   target="_blank"
                   rel="noopener"
-                  >linkedin</a
+                  ><span>linkedin</span></a
                 >
                 <a
+                  data-icon="document"
                   href="https://drive.google.com/file/d/1gtAMviM329eqGWURrzCcOWMZM2PIkAjC/view?usp=sharing"
                   target="_blank"
                   rel="noopener"
-                  >résumé</a
+                  ><span>résumé</span></a
                 >
-                <a href="mailto:devadula.nandan@gmail.com">email</a>
+                <a data-icon="email" href="mailto:devadula.nandan@gmail.com"
+                  ><span>email</span></a
+                >
               </div>
             </div>
 
@@ -1372,6 +1491,11 @@
             id="langlegend"
             aria-label="Language breakdown"
           ></p>
+          <div class="heatmap-block" id="hm" hidden>
+            <h3 class="hm-title">contributions — last 12 months</h3>
+            <div class="heatmap" id="heatmap" aria-hidden="true"></div>
+            <p class="hm-caption" id="hm-caption"></p>
+          </div>
         </div>
       </section>
 
@@ -1430,24 +1554,27 @@
                 >devadula.nandan@gmail.com</a
               >
               <div class="contact-meta">
-                <span>+91 70323 28703</span>
+                <span data-icon="phone">+91 70323 28703</span>
                 <a
+                  data-icon="github"
                   href="https://github.com/devadula-nandan"
                   target="_blank"
                   rel="noopener"
-                  >github</a
+                  ><span>github</span></a
                 >
                 <a
+                  data-icon="linkedin"
                   href="https://www.linkedin.com/in/nandan-devadula"
                   target="_blank"
                   rel="noopener"
-                  >linkedin</a
+                  ><span>linkedin</span></a
                 >
                 <a
+                  data-icon="document"
                   href="https://drive.google.com/file/d/1gtAMviM329eqGWURrzCcOWMZM2PIkAjC/view?usp=sharing"
                   target="_blank"
                   rel="noopener"
-                  >résumé ↗</a
+                  ><span>résumé</span></a
                 >
               </div>
             </div>
@@ -1458,23 +1585,25 @@
                 >
                 <span class="chat-status" id="chat-status">● connecting…</span>
                 <button
+                  class="chat-mode"
+                  id="chat-mode"
+                  type="button"
+                  title="Switch between the on-device model and the cloud model"
+                ></button>
+                <button
                   class="chat-btn"
                   id="chat-reset"
                   type="button"
                   aria-label="Reset conversation"
                   title="Reset"
-                >
-                  ↺
-                </button>
+                ></button>
                 <button
                   class="chat-btn"
                   id="chat-max"
                   type="button"
                   aria-label="Maximize chat"
                   title="Maximize"
-                >
-                  ⤢
-                </button>
+                ></button>
               </div>
               <div class="chat-log" id="chat-log" aria-live="polite"></div>
               <form class="chat-form" id="chat-form">
@@ -1486,7 +1615,9 @@
                   aria-label="Message the assistant"
                   autocomplete="off"
                 />
-                <button type="submit">send ↵</button>
+                <button type="submit" data-icon="send" aria-label="Send message">
+                  <span>send</span>
+                </button>
               </form>
             </div>
           </div>
@@ -1512,10 +1643,68 @@
     <script>
       document.getElementById("year").textContent = new Date().getFullYear();
 
+      /* ---------- inline Carbon icons (@carbon/icons, Apache-2.0) ---------- */
+      const svg = (paths) =>
+        `<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">${paths}</svg>`;
+      const ICONS = {
+        // brightness-contrast
+        auto: svg(
+          '<path d="M15 2H17V5H15z"/><path d="M27 15H30V17H27z"/><path d="M15 27H17V30H15z"/><path d="M2 15H5V17H2z"/><path d="M6.22 5.73H8.219999999999999V8.73H6.22z" transform="rotate(-45 7.227 7.236)"/><path d="M23.27 6.23H26.27V8.23H23.27z" transform="rotate(-45 24.766 7.232)"/><path d="M23.77 23.27H25.77V26.27H23.77z" transform="rotate(-45 24.77 24.77)"/><path d="M5.47 25.13 7.59 23 9 24.42 6.88 26.54 5.47 25.13z"/><path d="M16,8a8,8,0,1,0,8,8A8,8,0,0,0,16,8Zm0,14a6,6,0,0,1,0-12Z"/>',
+        ),
+        // sun
+        light: svg(
+          '<path d="M16,12a4,4,0,1,1-4,4,4.0045,4.0045,0,0,1,4-4m0-2a6,6,0,1,0,6,6,6,6,0,0,0-6-6Z" transform="translate(0 .005)"/><path d="M6.854 5.375H8.854V10.333H6.854z" transform="rotate(-45 7.86 7.856)"/><path d="M2 15.005H7V17.005000000000003H2z"/><path d="M5.375 23.147H10.333V25.147H5.375z" transform="rotate(-45 7.86 24.149)"/><path d="M15 25.005H17V30.005H15z"/><path d="M23.147 21.668H25.147V26.625999999999998H23.147z" transform="rotate(-45 24.152 24.149)"/><path d="M25 15.005H30V17.005000000000003H25z"/><path d="M21.668 6.854H26.625999999999998V8.854H21.668z" transform="rotate(-45 24.152 7.856)"/><path d="M15 2.005H17V7.005H15z"/>',
+        ),
+        // moon
+        dark: svg(
+          '<path d="M13.5025,5.4136A15.0755,15.0755,0,0,0,25.096,23.6082a11.1134,11.1134,0,0,1-7.9749,3.3893c-.1385,0-.2782.0051-.4178,0A11.0944,11.0944,0,0,1,13.5025,5.4136M14.98,3a1.0024,1.0024,0,0,0-.1746.0156A13.0959,13.0959,0,0,0,16.63,28.9973c.1641.006.3282,0,.4909,0a13.0724,13.0724,0,0,0,10.702-5.5556,1.0094,1.0094,0,0,0-.7833-1.5644A13.08,13.08,0,0,1,15.8892,4.38,1.0149,1.0149,0,0,0,14.98,3Z"/>',
+        ),
+        restart: svg(
+          '<path d="M26,18A10,10,0,1,1,16,8h6.1821l-3.5844,3.5854L20,13l6-6L20,1,18.5977,2.414,22.1851,6H16A12,12,0,1,0,28,18Z"/>',
+        ),
+        maximize: svg(
+          '<path d="M20 2 20 4 26.586 4 18 12.582 19.414 14 28 5.414 28 12 30 12 30 2 20 2z"/><path d="M14 19.416 12.592 18 4 26.586 4 20 2 20 2 30 12 30 12 28 5.414 28 14 19.416z"/>',
+        ),
+        minimize: svg(
+          '<path d="M4 18 4 20 10.586 20 2 28.582 3.414 30 12 21.414 12 28 14 28 14 18 4 18z"/><path d="M30 3.416 28.592 2 20 10.586 20 4 18 4 18 14 28 14 28 12 21.414 12 30 3.416z"/>',
+        ),
+        // logo--github
+        github: svg(
+          '<path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"/>',
+        ),
+        // logo--linkedin
+        linkedin: svg(
+          '<path d="M26.2,4H5.8C4.8,4,4,4.8,4,5.7v20.5c0,0.9,0.8,1.7,1.8,1.7h20.4c1,0,1.8-0.8,1.8-1.7V5.7C28,4.8,27.2,4,26.2,4z M11.1,24.4H7.6V13h3.5V24.4z M9.4,11.4c-1.1,0-2.1-0.9-2.1-2.1c0-1.2,0.9-2.1,2.1-2.1c1.1,0,2.1,0.9,2.1,2.1S10.5,11.4,9.4,11.4z M24.5,24.3H21v-5.6c0-1.3,0-3.1-1.9-3.1c-1.9,0-2.1,1.5-2.1,2.9v5.7h-3.5V13h3.3v1.5h0.1c0.5-0.9,1.6-1.9,3.3-1.9c3.5,0,4.2,2.3,4.2,5.3V24.3z"/>',
+        ),
+        email: svg(
+          '<path d="M28,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V8A2,2,0,0,0,28,6ZM25.8,8,16,14.78,6.2,8ZM4,24V8.91l11.43,7.91a1,1,0,0,0,1.14,0L28,8.91V24Z"/>',
+        ),
+        document: svg(
+          '<path d="M25.7,9.3l-7-7C18.5,2.1,18.3,2,18,2H8C6.9,2,6,2.9,6,4v24c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V10C26,9.7,25.9,9.5,25.7,9.3z M18,4.4l5.6,5.6H18V4.4z M24,28H8V4h8v6c0,1.1,0.9,2,2,2h6V28z"/><path d="M10 22H22V24H10z"/><path d="M10 16H22V18H10z"/>',
+        ),
+        send: svg(
+          '<path d="M27.45,15.11l-22-11a1,1,0,0,0-1.08.12,1,1,0,0,0-.33,1L7,16,4,26.74A1,1,0,0,0,5,28a1,1,0,0,0,.45-.11l22-11a1,1,0,0,0,0-1.78Zm-20.9,10L8.76,17H18V15H8.76L6.55,6.89,24.76,16Z"/>',
+        ),
+        phone: svg(
+          '<path d="M26,29h-.17C6.18,27.87,3.39,11.29,3,6.23A3,3,0,0,1,5.76,3h5.51a2,2,0,0,1,1.86,1.26L14.65,8a2,2,0,0,1-.44,2.16l-2.13,2.15a9.37,9.37,0,0,0,7.58,7.6l2.17-2.15A2,2,0,0,1,24,17.35l3.77,1.51A2,2,0,0,1,29,20.72V26A3,3,0,0,1,26,29ZM6,5A1,1,0,0,0,5,6v.08C5.46,12,8.41,26,25.94,27A1,1,0,0,0,27,26.06V20.72l-3.77-1.51-2.87,2.85L19.88,22C11.18,20.91,10,12.21,10,12.12l-.06-.48,2.84-2.87L11.28,5Z"/>',
+        ),
+        // chip — on-device / WebLLM
+        chip: svg(
+          '<path d="M11,11V21H21V11Zm8,8H13V13h6Z"/><path d="M30,13V11H26V8a2,2,0,0,0-2-2H21V2H19V6H13V2H11V6H8A2,2,0,0,0,6,8v3H2v2H6v6H2v2H6v3a2,2,0,0,0,2,2h3v4h2V26h6v4h2V26h3a2,2,0,0,0,2-2V21h4V19H26V13ZM24,24H8V8H24Z"/>',
+        ),
+        cloud: svg(
+          '<path d="M16,7h0a7.66,7.66,0,0,1,1.51.15,8,8,0,0,1,6.35,6.34l.26,1.35,1.35.24a5.5,5.5,0,0,1-1,10.92H7.5a5.5,5.5,0,0,1-1-10.92l1.34-.24.26-1.35A8,8,0,0,1,16,7m0-2a10,10,0,0,0-9.83,8.12A7.5,7.5,0,0,0,7.49,28h17a7.5,7.5,0,0,0,1.32-14.88,10,10,0,0,0-7.94-7.94A10.27,10.27,0,0,0,16,5Z"/>',
+        ),
+      };
+
+      /* fill any [data-icon] element with its inline Carbon glyph (links still work if this never runs) */
+      document.querySelectorAll("[data-icon]").forEach((el) => {
+        el.insertAdjacentHTML("afterbegin", ICONS[el.dataset.icon] || "");
+      });
+
       /* ---------- theme switcher: auto → light → dark ---------- */
       const themeBtn = document.getElementById("theme-btn");
       const THEMES = ["auto", "light", "dark"];
-      const THEME_ICONS = { auto: "◐", light: "○", dark: "●" };
 
       function applyTheme(t) {
         if (t === "auto") {
@@ -1525,7 +1714,7 @@
           document.documentElement.dataset.theme = t;
           localStorage.setItem("theme", t);
         }
-        themeBtn.textContent = `${THEME_ICONS[t]} ${t}`;
+        themeBtn.innerHTML = ICONS[t] + `<span>${t}</span>`;
         themeBtn.setAttribute("aria-label", "Theme: " + t);
       }
 
@@ -1581,17 +1770,22 @@
       const chatLog = document.getElementById("chat-log");
       const chatInput = document.getElementById("chat-input");
 
-      /* GET /api/health → { ok } — is the Gemini-backed assistant live? */
-      (async () => {
-        const status = document.getElementById("chat-status");
+      const chatStatus = document.getElementById("chat-status");
+      function setStatus(text, on) {
+        chatStatus.textContent = "● " + text;
+        chatStatus.classList.toggle("on", !!on);
+      }
+
+      /* GET /api/health → { ok } — is the Gemini-backed cloud assistant live? */
+      async function runHealthCheck() {
+        setStatus("connecting…", false);
         try {
           const { ok } = await (await fetch("/api/health")).json();
-          status.textContent = ok ? "● online" : "● fallback";
-          status.classList.toggle("on", ok);
+          setStatus(ok ? "online" : "fallback", ok);
         } catch {
-          status.textContent = "● fallback";
+          setStatus("fallback", false);
         }
-      })();
+      }
 
       function addMsg(who, text) {
         const div = document.createElement("div");
@@ -1649,46 +1843,241 @@
       );
       greetIO.observe(chatEl);
 
+      /* conversation history — shared across both engines (role/content turns) */
+      const history = [];
+      const MAX_HISTORY = 12;
+      const strip = (t) => t.replace(/\*\*?/g, "");
+      /* drop a trailing fragment when the model is cut off mid-sentence by max_tokens */
+      function tidyReply(t) {
+        t = strip(t).trim();
+        if (!/[.!?]["')]?$/.test(t)) {
+          const cut = Math.max(
+            t.lastIndexOf("."),
+            t.lastIndexOf("!"),
+            t.lastIndexOf("?"),
+          );
+          if (cut > 30) t = t.slice(0, cut + 1);
+        }
+        return t;
+      }
+
+      /* system prompt for the on-device model (the cloud path has its own copy server-side).
+         Kept tight and directive — small models drift with long, discursive prompts. */
+      const LOCAL_SYSTEM = `You are Nandan Devadula, replying in the first person to a visitor on your portfolio site.
+
+Rules:
+- Answer in 1-2 short, natural sentences. Never write a long list or essay.
+- Use ONLY the facts below. If something isn't here, say you're not sure — never invent numbers, dates, companies, or clients.
+- Continue the conversation naturally; don't repeat a greeting or re-introduce yourself after the first message.
+- Plain text only.
+
+Facts about you:
+- Frontend Developer at IBM in Kochi, India, on the Carbon Design System team since November 2023. You build accessible, enterprise-grade Web Components for Carbon for IBM Products and Carbon for AI, prototype in Carbon Labs, and do WCAG accessibility testing.
+- Before IBM: Software Engineer at HCL Technologies (2022-2023, financial dashboards and REST APIs); Web UI Developer at Ochre Media (2021-2022, B2B microsites).
+- B.E. in Electronics & Communication from Andhra University.
+- Skills: JavaScript, TypeScript, React, Lit, Web Components, the Carbon Design System, CSS/SCSS, Jest, Cypress, Playwright, and Python.
+- 40+ public GitHub repos, including wc-audio-input, wc-resizer, and storybook-theme-carbon.
+- Contact: devadula.nandan@gmail.com, github.com/devadula-nandan, linkedin.com/in/nandan-devadula.
+- Favorite color: Carbon blue (#0f62fe).`;
+
+      /* a tiny example exchange, prepended before real turns, to anchor the voice and length
+         a 135M model won't hold from instructions alone */
+      const LOCAL_FEWSHOT = [
+        { role: "user", content: "hey, who are you?" },
+        {
+          role: "assistant",
+          content:
+            "I'm Nandan, a frontend developer at IBM on the Carbon Design System team. Ask me anything about my work, skills, or how to reach me.",
+        },
+        { role: "user", content: "what do you work with?" },
+        {
+          role: "assistant",
+          content:
+            "Mostly TypeScript and Web Components with Lit, plus React — and a lot of accessibility and testing work with Jest, Cypress, and Playwright.",
+        },
+      ];
+
+      /* ---------- engine selection: local (WebLLM / WebGPU) vs cloud (Gemini) ---------- */
+      const LOCAL_MODEL = "SmolLM2-360M-Instruct-q4f16_1-MLC"; // ~376MB — nearly the smallest, far more coherent than 135M
+      const modeBtn = document.getElementById("chat-mode");
+      let mode = "cloud"; // default — server-side Gemini
+      let localSupported = false;
+      let engineReady = false;
+      let enginePromise = null;
+      let loadingBubble = null; // bubble showing model-download progress, if any
+      let busy = false;
+
+      async function webgpuOK() {
+        try {
+          return !!(navigator.gpu && (await navigator.gpu.requestAdapter()));
+        } catch {
+          return false;
+        }
+      }
+
+      function onProgress(p) {
+        const pct = Math.round((p.progress || 0) * 100);
+        if (mode === "local" && !engineReady) setStatus(`loading ${pct}%`, false);
+        if (loadingBubble)
+          loadingBubble.textContent = `Downloading the on-device model… ${pct}% (first time only)`;
+      }
+
+      /* lazily import WebLLM and spin up the engine — the model downloads on first use, then caches */
+      function ensureEngine() {
+        if (!enginePromise) {
+          enginePromise = (async () => {
+            const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+            return webllm.CreateMLCEngine(LOCAL_MODEL, {
+              initProgressCallback: onProgress,
+            });
+          })().catch((err) => {
+            enginePromise = null; // allow a retry on the next message
+            throw err;
+          });
+        }
+        return enginePromise;
+      }
+
+      function renderMode() {
+        modeBtn.innerHTML =
+          (mode === "local" ? ICONS.chip : ICONS.cloud) + `<span>${mode}</span>`;
+        modeBtn.setAttribute(
+          "aria-label",
+          `Answering engine: ${mode}. Click to switch.`,
+        );
+        if (mode === "local") setStatus(engineReady ? "on-device" : "on-device", engineReady);
+        else runHealthCheck();
+      }
+
+      modeBtn.addEventListener("click", () => {
+        if (busy) return;
+        if (mode === "local") {
+          mode = "cloud";
+        } else if (localSupported) {
+          mode = "local";
+        } else {
+          setStatus("WebGPU unavailable", false);
+          return;
+        }
+        renderMode();
+      });
+
+      /* cloud path — POST to the serverless Gemini endpoint */
+      async function respondCloud(pending) {
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: history.slice(-MAX_HISTORY),
+              message: history[history.length - 1].content,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.reply) {
+            history.push({ role: "assistant", content: data.reply });
+            typeInto(pending, strip(data.reply));
+          } else {
+            history.pop();
+            typeInto(pending, "Sorry, I couldn't come up with a response to that.");
+          }
+        } catch {
+          history.pop();
+          typeInto(
+            pending,
+            "I seem to be offline — email me directly at devadula.nandan@gmail.com.",
+          );
+        }
+      }
+
+      /* local path — stream tokens straight from the in-browser model */
+      async function respondLocal(pending) {
+        loadingBubble = pending;
+        pending.textContent = "Preparing the on-device model…";
+        try {
+          const engine = await ensureEngine();
+          engineReady = true;
+          loadingBubble = null;
+          finishTyping();
+          pending.classList.remove("typing");
+          pending.textContent = "";
+          const messages = [
+            { role: "system", content: LOCAL_SYSTEM },
+            ...LOCAL_FEWSHOT,
+            ...history.slice(-MAX_HISTORY),
+          ];
+          const stream = await engine.chat.completions.create({
+            messages,
+            temperature: 0.5,
+            top_p: 0.9,
+            frequency_penalty: 0.6, // curb "before that… before that…" repetition loops
+            presence_penalty: 0.3,
+            max_tokens: 120, // short, chat-length replies
+            stream: true,
+          });
+          let text = "";
+          for await (const chunk of stream) {
+            text += chunk.choices?.[0]?.delta?.content || "";
+            pending.textContent = strip(text);
+            chatLog.scrollTop = chatLog.scrollHeight;
+          }
+          const reply = tidyReply(text);
+          if (reply) {
+            pending.textContent = reply;
+            history.push({ role: "assistant", content: reply });
+            setStatus("on-device", true);
+          } else {
+            history.pop();
+            pending.textContent = "I couldn't generate a reply — try again.";
+          }
+        } catch (err) {
+          loadingBubble = null;
+          history.pop();
+          pending.textContent =
+            "The on-device model couldn't load here. Switch to cloud with the toggle above.";
+          setStatus("on-device", false);
+        }
+      }
+
       document
         .getElementById("chat-form")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const message = chatInput.value.trim();
-          if (!message) return;
+          if (!message || busy) return;
+          busy = true;
           addMsg("you", message);
           chatInput.value = "";
+          history.push({ role: "user", content: message });
           const pending = addMsg("bot", "…");
           try {
-            const res = await fetch("/api/chat", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message }),
-            });
-            const data = await res.json();
-            typeInto(
-              pending,
-              (
-                data.reply ||
-                "Sorry, I couldn't come up with a response to that."
-              ).replace(/\*\*?/g, ""),
-            );
-          } catch {
-            typeInto(
-              pending,
-              "I seem to be offline — email me directly at devadula.nandan@gmail.com.",
-            );
+            if (mode === "local") await respondLocal(pending);
+            else await respondCloud(pending);
+          } finally {
+            busy = false;
           }
         });
 
-      /* reset — clear the log and re-type the greeting */
-      document.getElementById("chat-reset").addEventListener("click", () => {
+      /* reset — clear the log and context, keep the loaded model, re-type the greeting */
+      const resetBtn = document.getElementById("chat-reset");
+      resetBtn.innerHTML = ICONS.restart;
+      resetBtn.addEventListener("click", () => {
+        if (busy) return;
         finishTyping();
+        history.length = 0;
         chatLog.textContent = "";
         typeInto(addMsg("bot", ""), GREETING);
       });
 
+      /* default to cloud; detect WebGPU so the toggle can offer the on-device model */
+      (async () => {
+        localSupported = await webgpuOK();
+        renderMode();
+      })();
+
       /* maximize — pin the chat at its current rect, then transition to the full viewport (and back) */
       const maxBtn = document.getElementById("chat-max");
+      maxBtn.innerHTML = ICONS.maximize;
       const chatPh = document.createElement("div"); // placeholder keeps the grid cell from collapsing
       chatPh.hidden = true;
       chatEl.before(chatPh);
@@ -1740,7 +2129,7 @@
           }
         }
         maximized = !maximized;
-        maxBtn.textContent = maximized ? "⤡" : "⤢";
+        maxBtn.innerHTML = maximized ? ICONS.minimize : ICONS.maximize;
         const label = maximized ? "Restore chat" : "Maximize chat";
         maxBtn.setAttribute("aria-label", label);
         maxBtn.title = label.split(" ")[0];
@@ -1821,6 +2210,37 @@
           }
         } catch {
           /* static fallback numbers stay */
+        }
+      })();
+
+      /* contribution heatmap — public mirror of the GitHub contribution graph; stays hidden if unreachable */
+      (async () => {
+        try {
+          const res = await fetch(
+            "https://github-contributions-api.jogruber.de/v4/devadula-nandan?y=last",
+          );
+          if (!res.ok) return;
+          const { contributions } = await res.json();
+          if (!contributions || !contributions.length) return;
+          const grid = document.getElementById("heatmap");
+          // pad so the first column starts on the right weekday row (Sun–Sat)
+          const pad = new Date(contributions[0].date + "T00:00").getDay();
+          for (let i = 0; i < pad; i++) {
+            grid.appendChild(document.createElement("i")).style.visibility =
+              "hidden";
+          }
+          for (const d of contributions) {
+            const cell = document.createElement("i");
+            if (d.level) cell.className = "lv" + d.level;
+            cell.title = `${d.date} — ${d.count} contribution${d.count === 1 ? "" : "s"}`;
+            grid.appendChild(cell);
+          }
+          const total = contributions.reduce((n, d) => n + d.count, 0);
+          document.getElementById("hm-caption").textContent =
+            `${total} contributions in the last year`;
+          document.getElementById("hm").hidden = false;
+        } catch {
+          /* leave hidden */
         }
       })();
     </script>
