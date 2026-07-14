@@ -22,16 +22,42 @@ const server = http.createServer((req, res) => {
 
   // Intercept API routes and proxy to the deployed Vercel instance to bypass local browser CORS policy
   if (safePath === '/api/health' && req.method === 'GET') {
-    fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/health')
-      .then(proxyRes => proxyRes.json())
-      .then(data => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(data));
-      })
-      .catch(err => {
-        res.writeHead(502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
-      });
+    if (process.env.GOOGLE_API_KEY) {
+      try {
+        const handler = require('./api/health.js');
+        const mockReq = { headers: req.headers };
+        const mockRes = {
+          statusCode: 200,
+          setHeader: function(name, val) {
+            res.setHeader(name, val);
+          },
+          status: function(code) {
+            this.statusCode = code;
+            return this;
+          },
+          json: function(data) {
+            res.writeHead(this.statusCode, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+            return this;
+          }
+        };
+        handler(mockReq, mockRes);
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Local health check failed', details: err.message }));
+      }
+    } else {
+      fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/health')
+        .then(proxyRes => proxyRes.json())
+        .then(data => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(data));
+        })
+        .catch(err => {
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
+        });
+    }
     return;
   }
 
@@ -40,23 +66,65 @@ const server = http.createServer((req, res) => {
     req.on('data', chunk => {
       body += chunk.toString();
     });
-    req.on('end', () => {
-      fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: body
-      })
-        .then(proxyRes => {
-          return proxyRes.json().then(data => ({ status: proxyRes.status, data }));
+    req.on('end', async () => {
+      if (process.env.GOOGLE_API_KEY) {
+        console.log('Running api/chat.js locally since GOOGLE_API_KEY is set.');
+        try {
+          delete require.cache[require.resolve('./api/chat.js')];
+          const handler = require('./api/chat.js');
+          const parsedBody = body ? JSON.parse(body) : {};
+
+          const mockReq = {
+            method: 'POST',
+            body: parsedBody,
+            headers: req.headers,
+          };
+
+          const mockRes = {
+            statusCode: 200,
+            setHeader: function(name, val) {
+              res.setHeader(name, val);
+            },
+            status: function(code) {
+              this.statusCode = code;
+              return this;
+            },
+            json: function(data) {
+              res.writeHead(this.statusCode, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(data));
+              return this;
+            },
+            end: function() {
+              res.writeHead(this.statusCode);
+              res.end();
+              return this;
+            }
+          };
+
+          await handler(mockReq, mockRes);
+        } catch (err) {
+          console.error('Error executing local chat handler:', err);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Local execution failed', details: err.message }));
+        }
+      } else {
+        fetch('https://portfolio-five-theta-ftdhmviqc3.vercel.app/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
         })
-        .then(({ status, data }) => {
-          res.writeHead(status, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(data));
-        })
-        .catch(err => {
-          res.writeHead(502, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
-        });
+          .then(proxyRes => {
+            return proxyRes.json().then(data => ({ status: proxyRes.status, data }));
+          })
+          .then(({ status, data }) => {
+            res.writeHead(status, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+          })
+          .catch(err => {
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Proxy unreachable', details: err.message }));
+          });
+      }
     });
     return;
   }

@@ -1,7 +1,34 @@
 const { setCorsHeaders } = require('../lib/cors.js');
 
-const GEMINI_MODEL = 'gemini-flash-lite-latest';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+// Available models ordered from highest to lowest quality
+const MODELS_HIERARCHY = [
+  'gemini-2.5-pro',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite'
+];
+
+// Helper to determine the fallback chain based on preferred model
+function getFallbackChain(preferredModel) {
+  const chain = [];
+  const idx = MODELS_HIERARCHY.indexOf(preferredModel);
+  if (idx !== -1) {
+    for (let i = idx; i < MODELS_HIERARCHY.length; i++) {
+      chain.push(MODELS_HIERARCHY[i]);
+    }
+  } else {
+    // Default fallback starting point if preferred model is not matched
+    chain.push('gemini-2.5-flash-lite');
+  }
+
+  // Ensure ultimate fallbacks are included in case the 2.5 names have issues
+  const ultimateFallbacks = ['gemini-flash-lite-latest', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+  for (const model of ultimateFallbacks) {
+    if (!chain.includes(model)) {
+      chain.push(model);
+    }
+  }
+  return chain;
+}
 
 const MAX_MSG_LENGTH = 500; // per message
 const MAX_TURNS = 12;        // most recent messages kept for context
@@ -72,31 +99,64 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  try {
-    const geminiRes = await fetch(`${GEMINI_URL}?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: { text: SYSTEM_PROMPT } },
-        contents,
-        generationConfig: { maxOutputTokens: 400, temperature: 0.75, topP: 0.9 },
-      }),
-    });
+  let reply = null;
+  let modelUsed = null;
+  let lastError = null;
 
-    if (!geminiRes.ok) {
-      const errorBody = await geminiRes.text();
-      console.error('Gemini API call failed:', geminiRes.status, errorBody);
-      res.status(502).json({ error: 'Upstream error' });
-      return;
+  const fallbackChain = getFallbackChain(req.body?.preferredModel);
+
+  for (const model of fallbackChain) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GOOGLE_API_KEY}`;
+      console.log(`Attempting chat generation with model: ${model}`);
+      const geminiRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: { text: SYSTEM_PROMPT } },
+          contents,
+          generationConfig: { maxOutputTokens: 400, temperature: 0.75, topP: 0.9 },
+        }),
+      });
+
+      if (geminiRes.status === 429 || geminiRes.status === 403) {
+        const errorBody = await geminiRes.text();
+        console.warn(`Model ${model} rate-limited or quota exceeded (status ${geminiRes.status}): ${errorBody}. Trying next fallback...`);
+        lastError = { status: geminiRes.status, body: errorBody };
+        continue;
+      }
+
+      if (!geminiRes.ok) {
+        const errorBody = await geminiRes.text();
+        console.warn(`Model ${model} failed with status ${geminiRes.status}: ${errorBody}. Trying next fallback...`);
+        lastError = { status: geminiRes.status, body: errorBody };
+        continue;
+      }
+
+      const data = await geminiRes.json();
+      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (generatedText) {
+        reply = generatedText;
+        modelUsed = model;
+        break; // Success!
+      } else {
+        console.warn(`Model ${model} returned empty response candidates. Trying next fallback...`);
+        lastError = { status: 200, body: 'No candidates returned' };
+      }
+    } catch (err) {
+      console.error(`Error executing model ${model}:`, err?.message);
+      lastError = { status: 500, body: err?.message };
     }
-
-    const data = await geminiRes.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
-      || "Sorry, I couldn't come up with a response to that.";
-
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error('Gemini API call failed:', err?.message);
-    res.status(502).json({ error: 'Upstream error' });
   }
+
+  if (!reply) {
+    console.error('All models in the fallback chain failed.');
+    res.status(lastError?.status || 502).json({
+      error: 'All Gemini models exhausted',
+      details: lastError?.body || 'Unknown error'
+    });
+    return;
+  }
+
+  res.status(200).json({ reply, modelUsed });
 };

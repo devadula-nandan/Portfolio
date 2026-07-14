@@ -938,6 +938,35 @@
         height: 12px;
         fill: currentColor;
       }
+      .chat-model-select {
+        display: inline-flex;
+        align-items: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--ink-2);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.68rem;
+        padding: 2px 24px 2px 8px;
+        cursor: pointer;
+        outline: none;
+        transition:
+          border-color 0.2s ease,
+          color 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path fill='%238d8d8d' d='M2,3 L5,6 L8,3 Z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+      }
+      .chat-model-select:hover {
+        border-color: var(--blue);
+        color: var(--ink);
+      }
+      .chat-model-select:focus-visible {
+        border-color: var(--blue);
+      }
 
       /* typing caret */
       .msg.bot.typing::after {
@@ -995,6 +1024,23 @@
         font-size: 0.68rem;
         color: var(--blue);
         margin-bottom: 3px;
+      }
+      .msg.system {
+        align-self: center;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--ink-2);
+        opacity: 0.85;
+        text-align: center;
+        background: none;
+        border: 1px dashed var(--border);
+        padding: 4px 10px;
+        border-radius: 4px;
+        max-width: 90%;
+        margin: 4px 0;
+      }
+      .msg.system::before {
+        content: none !important;
       }
       .chat-form {
         display: flex;
@@ -1590,6 +1636,17 @@
                   type="button"
                   title="Switch between the on-device model and the cloud model"
                 ></button>
+                <select
+                  class="chat-model-select"
+                  id="chat-model-select"
+                  title="Choose Cloud Model"
+                  aria-label="Cloud Model"
+                  style="display: inline-flex;"
+                >
+                  <option value="gemini-2.5-pro" selected>Pro (Best)</option>
+                  <option value="gemini-2.5-flash">Flash (Balanced)</option>
+                  <option value="gemini-2.5-flash-lite">Flash-Lite (Fastest)</option>
+                </select>
                 <button
                   class="chat-btn"
                   id="chat-reset"
@@ -1900,7 +1957,9 @@ Facts about you:
       /* ---------- engine selection: local (WebLLM / WebGPU) vs cloud (Gemini) ---------- */
       const LOCAL_MODEL = "SmolLM2-360M-Instruct-q4f16_1-MLC"; // ~376MB — nearly the smallest, far more coherent than 135M
       const modeBtn = document.getElementById("chat-mode");
+      const modelSelect = document.getElementById("chat-model-select");
       let mode = "cloud"; // default — server-side Gemini
+      let preferredCloudModel = "gemini-2.5-pro"; // default preferred cloud model
       let localSupported = false;
       let engineReady = false;
       let enginePromise = null;
@@ -1945,8 +2004,13 @@ Facts about you:
           "aria-label",
           `Answering engine: ${mode}. Click to switch.`,
         );
-        if (mode === "local") setStatus(engineReady ? "on-device" : "on-device", engineReady);
-        else runHealthCheck();
+        if (mode === "local") {
+          setStatus(engineReady ? "on-device" : "on-device", engineReady);
+          modelSelect.style.display = "none";
+        } else {
+          runHealthCheck();
+          modelSelect.style.display = "inline-flex";
+        }
       }
 
       modeBtn.addEventListener("click", () => {
@@ -1962,6 +2026,17 @@ Facts about you:
         renderMode();
       });
 
+      modelSelect.addEventListener("change", (e) => {
+        preferredCloudModel = e.target.value;
+      });
+
+      function getFriendlyModelName(modelId) {
+        if (modelId.includes("pro")) return "Gemini Pro";
+        if (modelId.includes("flash-lite")) return "Gemini Flash-Lite";
+        if (modelId.includes("flash")) return "Gemini Flash";
+        return modelId;
+      }
+
       /* cloud path — POST to the serverless Gemini endpoint */
       async function respondCloud(pending) {
         try {
@@ -1971,12 +2046,24 @@ Facts about you:
             body: JSON.stringify({
               messages: history.slice(-MAX_HISTORY),
               message: history[history.length - 1].content,
+              preferredModel: preferredCloudModel,
             }),
           });
           const data = await res.json().catch(() => ({}));
           if (res.ok && data.reply) {
             history.push({ role: "assistant", content: data.reply });
             typeInto(pending, strip(data.reply));
+
+            if (data.modelUsed && data.modelUsed !== preferredCloudModel) {
+              const oldModelName = getFriendlyModelName(preferredCloudModel);
+              const newModelName = getFriendlyModelName(data.modelUsed);
+              preferredCloudModel = data.modelUsed;
+              modelSelect.value = preferredCloudModel;
+              
+              setTimeout(() => {
+                addMsg("system", `${oldModelName} rate-limited. Auto-switched to ${newModelName}.`);
+              }, 600);
+            }
           } else {
             history.pop();
             typeInto(pending, "Sorry, I couldn't come up with a response to that.");
